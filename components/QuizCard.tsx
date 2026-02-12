@@ -16,11 +16,8 @@ const DIFFICULTY_COLORS: Record<string, string[]> = {
 };
 
 export function QuizCard({ quiz, onPress }: Props) {
-  const gradient =
-    DIFFICULTY_COLORS[quiz.difficulty] ??
-    ['#38bdf8', '#0284c7'];
-    console.log("print quiz difficulty: ",quiz.difficulty);
-    
+  const gradient = DIFFICULTY_COLORS[quiz.difficulty] ?? ['#38bdf8', '#0284c7'];
+  console.log("print quiz difficulty: ",quiz.difficulty);   
 
   return (
     <Pressable
