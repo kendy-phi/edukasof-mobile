@@ -8,8 +8,7 @@ export default function RootLayout() {
                 screenOptions={{
                     headerShown: false,
                 }}
-            />;
+            />
         </ThemeProvider>
     )
-}
-
+};
