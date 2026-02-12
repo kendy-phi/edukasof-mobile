@@ -14,6 +14,7 @@ import { useNavigation } from 'expo-router';
 import { BackHandler } from 'react-native';
 import { nestApi } from '../../../../api/nest';
 import { Question } from '../../../../types/question';
+import Screen from '@/components/Screen';
 
 
 export default function PlayQuizScreen() {
@@ -117,7 +118,7 @@ export default function PlayQuizScreen() {
     }
 
     return (
-        <View style={{ flex: 1, padding: 20 }}>
+        <Screen>
             {/* Progress */}
             <Text style={{ color: '#64748b', marginBottom: 8 }}>
                 Question {currentIndex + 1} / {questions.length}
@@ -223,6 +224,9 @@ export default function PlayQuizScreen() {
 
                     setSelected(null);
                     setCurrentIndex(i => i + 1);
+                    if((currentIndex+1) === questions.length){
+                        nestApi.post('', {})
+                    }
                 }}
                 style={{
                     marginTop: 'auto',
@@ -236,7 +240,7 @@ export default function PlayQuizScreen() {
                     {currentIndex + 1 === questions.length ? 'Finish' : 'Next'}
                 </Text>
             </Pressable>
-        </View>
+        </Screen>
     );
 }
 

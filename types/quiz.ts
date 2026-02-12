@@ -13,6 +13,7 @@ export type Quiz = {
   session: 'normal' | 'exam';
   isPublished: boolean;
   image?: string;
+  questionCount?:number;
   user_id: string;
   createdAt: string;
   updatedAt: string;
