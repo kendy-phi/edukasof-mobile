@@ -19,3 +19,11 @@ export type Quiz = {
   updatedAt: string;
   questions?: Question[];
 };
+
+export interface QuizPreview {
+  id: string;
+  title: string;
+  questionCount: number;
+  duration: number;
+  difficulty?: string;
+}
