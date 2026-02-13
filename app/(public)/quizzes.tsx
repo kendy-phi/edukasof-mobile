@@ -5,7 +5,7 @@ import { nestApi } from '../../api/nest';
 import { QuizCard } from '../../components/QuizCard';
 import { Quiz } from '../../types/quiz';
 import Screen from '@/components/Screen';
-
+import { getQuizProgress } from '@/utils/quizProgress';
 export default function QuizzesScreen() {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
 
@@ -26,6 +26,7 @@ export default function QuizzesScreen() {
         renderItem={({ item }) => (
           <QuizCard
             quiz={item}
+            completed={getQuizProgress(item.id)}
             onPress={() => router.push(`/quiz/${item.id}`)}
           />
         )}

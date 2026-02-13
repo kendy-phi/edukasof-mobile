@@ -52,7 +52,7 @@ export default function PlayQuizScreen() {
   // 🔹 Recover Progress
   useEffect(() => {
     const recover = async () => {
-      const progress = await getQuizProgress(id);
+      const progress = await getQuizProgress();
 
       if (progress && progress.quizId === id) {
         setCurrentIndex(progress.currentIndex);
@@ -102,7 +102,7 @@ export default function PlayQuizScreen() {
         answers: newAnswers,
       });
 
-      await clearQuizProgress(id);
+      await clearQuizProgress();
 
       router.replace(`/quiz/${id}/result`);
     } else {

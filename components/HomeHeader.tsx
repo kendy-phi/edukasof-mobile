@@ -1,11 +1,32 @@
 import { View, Text, Pressable } from 'react-native';
 import { useTheme } from '@/context/ThemeContext';
 
-export default function HomeHeader() {
-  const { theme, toggleTheme, mode } = useTheme();
+type Props = {
+  userName?: string;
+  onToggleTheme?: () => void;
+};
+
+export default function HomeHeader({
+  userName,
+  onToggleTheme,
+}: Props) {
+  const { theme, mode, toggleTheme } = useTheme();
+
+  const handleToggle = () => {
+    if (onToggleTheme) {
+      onToggleTheme();
+    } else {
+      toggleTheme();
+    }
+  };
 
   return (
-    <View style={{ marginBottom: 24 }}>
+    <View
+      style={{
+        marginBottom: 24,
+      }}
+    >
+      {/* Greeting */}
       <Text
         style={{
           fontSize: 26,
@@ -13,21 +34,23 @@ export default function HomeHeader() {
           color: theme.text,
         }}
       >
-        Bonjour 👋
+        Bonjour{userName ? `, ${userName}` : ''} 👋
       </Text>
 
       <Text
         style={{
-          marginTop: 4,
-          fontSize: 16,
+          marginTop: 6,
+          fontSize: 15,
           color: theme.secondaryText,
+          fontWeight: '500',
         }}
       >
         Prêt à relever un nouveau défi ?
       </Text>
 
+      {/* Theme Toggle */}
       <Pressable
-        onPress={toggleTheme}
+        onPress={handleToggle}
         style={{
           marginTop: 16,
           paddingVertical: 8,
@@ -39,7 +62,13 @@ export default function HomeHeader() {
           alignSelf: 'flex-start',
         }}
       >
-        <Text style={{ color: theme.text }}>
+        <Text
+          style={{
+            color: theme.text,
+            fontWeight: '600',
+            fontSize: 14,
+          }}
+        >
           {mode === 'light' ? '🌙 Mode sombre' : '☀️ Mode clair'}
         </Text>
       </Pressable>

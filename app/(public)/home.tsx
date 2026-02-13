@@ -13,8 +13,11 @@ import CategoryTabs from '@/components/CategoryTabs';
 import { QuizCard } from '@/components/QuizCard';
 import { useTheme } from '@/context/ThemeContext';
 import { useRouter } from 'expo-router';
-import { nestApi } from '@/api/nest';
 import { getQuizzes } from '@/api/quiz';
+import SkeletonFeatured from '@/components/SkeletonFeatured';
+import SkeletonCard from '@/components/SkeletonCard';
+import { getAllQuizProgress } from '@/utils/quizProgress';
+
 
 import { Quiz } from '@/types/quiz';
 
@@ -29,21 +32,26 @@ export default function HomeScreen() {
 	const [page, setPage] = useState(1);
 	const [hasMore, setHasMore] = useState(true);
 	const [loadingMore, setLoadingMore] = useState(false);
+	const [continueQuiz, setContinueQuiz] = useState<any>(null);
+	const [progressMap, setProgressMap] = useState<Record<string, any>>({});
+
+
 
 
 
 	// 🔹 Fetch quizzes
 	const loadQuizzes = async (pageNumber = 1, append = false) => {
 		try {
-			const data = await getQuizzes(pageNumber, 10);
+			const response = await getQuizzes(pageNumber, 10);
 
 			if (append) {
-				setQuizzes(prev => [...prev, ...data]);
+				setQuizzes(prev => [...prev, ...response.data]);
 			} else {
-				setQuizzes(data);
+				setQuizzes(response.data);
 			}
+			console.log("Data after loading: ", response.data);
 
-			setHasMore(data.length > 0);
+			setHasMore(response.data.length > 0);
 		} catch (error) {
 			console.log(error);
 		} finally {
@@ -52,11 +60,20 @@ export default function HomeScreen() {
 		}
 	};
 
-
 	// 🔹 Initial load
 	useEffect(() => {
 		loadQuizzes(1);
 	}, []);
+
+	useEffect(() => {
+		const loadProgress = async () => {
+			const progress = await getAllQuizProgress();
+			setProgressMap(progress);
+		};
+
+		loadProgress();
+	}, []);
+
 
 	const loadMore = async () => {
 		if (!hasMore || loadingMore) return;
@@ -92,18 +109,16 @@ export default function HomeScreen() {
 	if (loading) {
 		return (
 			<Screen>
-				<View
-					style={{
-						flex: 1,
-						justifyContent: 'center',
-						alignItems: 'center',
-					}}
-				>
-					<ActivityIndicator size="large" color={theme.primary} />
-				</View>
+				<HomeHeader />
+				<SkeletonFeatured />
+
+				{[1, 2, 3, 4].map((_, i) => (
+					<SkeletonCard key={i} />
+				))}
 			</Screen>
 		);
 	}
+
 
 	return (
 		<Screen>
@@ -142,14 +157,27 @@ export default function HomeScreen() {
 				/>
 
 				{/* QUIZ LIST */}
-				{filteredQuizzes.map((quiz) => (
-					<View key={quiz.id} style={{ marginBottom: 18 }}>
+				{filteredQuizzes.map((quiz) => {
+					const progress = progressMap[quiz.id];
+
+					let progressPercentage = 0;
+
+					if (progress && quiz.questionCount) {
+						progressPercentage =
+							(progress.currentIndex / quiz.questionCount) * 100;
+					}
+
+					return (
 						<QuizCard
+							key={quiz.id}
 							quiz={quiz}
+							progressPercentage={progressPercentage}
 							onPress={() => router.push(`/quiz/${quiz.id}`)}
 						/>
-					</View>
-				))}
+					);
+				})}
+
+
 
 				{loadingMore && (
 					<View style={{ paddingVertical: 20 }}>
