@@ -26,4 +26,5 @@ export interface QuizPreview {
   questionCount: number;
   duration: number;
   difficulty?: string;
+  category?: string;
 }

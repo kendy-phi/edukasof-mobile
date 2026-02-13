@@ -2,10 +2,10 @@ import { ScrollView, View, Text, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/context/ThemeContext';
-import { QuizPreview } from '@/types/quiz';
+import { Quiz } from '@/types/quiz';
 
 type Props = {
-    quizzes: QuizPreview[];
+    quizzes: Quiz[];
 };
 
 export default function FeaturedCarousel({ quizzes }: Props) {
