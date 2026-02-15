@@ -1,5 +1,5 @@
-import { View, Text, Pressable } from 'react-native';
-import { useLocalSearchParams, router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
+import { Pressable, Text, View } from 'react-native';
 
 export default function QuizResultScreen() {
   const { score, total, percentage } = useLocalSearchParams();
@@ -32,7 +32,7 @@ export default function QuizResultScreen() {
       </Text>
 
       <Pressable
-        onPress={() => router.replace('/')}
+        onPress={() => router.replace('/home')}
         style={{
           marginTop: 40,
           backgroundColor: '#2563eb',

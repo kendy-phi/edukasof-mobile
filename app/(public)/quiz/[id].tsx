@@ -1,3 +1,4 @@
+import Screen from '@/components/Screen';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
@@ -43,6 +44,7 @@ export default function QuizDetailScreen() {
   }
 
   return (
+    <Screen>
     <View style={{ flex: 1, padding: 20 }}>
       {/* Title */}
       <Text style={{ fontSize: 26, fontWeight: '800', marginBottom: 8 }}>
@@ -79,7 +81,7 @@ export default function QuizDetailScreen() {
         onPress={() => {
           // next step: start quiz session
           console.log('Start quiz', quiz.id);
-          router.push(`/quiz/play/${quiz.id}`)
+          router.push(`/quiz/${quiz.id}/play`)
 
         }}
         style={{
@@ -100,5 +102,6 @@ export default function QuizDetailScreen() {
         </Text>
       </Pressable>
     </View>
+    </Screen>
   );
 }

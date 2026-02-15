@@ -5,7 +5,7 @@ const KEY = 'QUIZ_PROGRESS';
 type QuizProgress = {
   quizId: string;
   currentIndex: number;
-  answers: Record<string, string>;
+  answers: Record<string, string[]>;
 };
 
 export const saveQuizProgress = async (data: QuizProgress) => {
@@ -45,3 +45,10 @@ export const clearQuizProgress = async (quizId: string) => {
 
   await AsyncStorage.setItem(KEY, JSON.stringify(allProgress));
 };
+
+export const deleteQuizzesProgress = async () =>{
+  await AsyncStorage.removeItem(KEY);
+  const saved = await AsyncStorage.getItem(KEY);
+  console.log("After cache suppression: ", saved);
+  
+}
