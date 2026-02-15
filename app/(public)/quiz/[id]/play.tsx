@@ -1,6 +1,7 @@
 
 import { nestApi } from '@/api/nest';
 import Screen from '@/components/Screen';
+import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { clearQuizProgress, getQuizProgress, saveQuizProgress } from '@/utils/quizProgress';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -30,6 +31,16 @@ export default function PlayQuizScreen() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [selected, setSelected] = useState<string | null>(null);
     const [answers, setAnswers] = useState<Record<string, string[]>>({});
+    const { isAuthenticated } = useAuth();
+
+
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            // check guest limit
+        }
+    }, []);
+
 
     // 🔹 Load Questions
     useEffect(() => {
@@ -39,6 +50,15 @@ export default function PlayQuizScreen() {
                 const sorted = response.data.questions.sort(
                     (a: any, b: any) => a.order - b.order
                 );
+
+                if (response.data.isPremium && !isAuthenticated) {
+                    router.replace({
+                        pathname: '/login',
+                        params: {
+                            message: "🔒 Ce quiz est premium. Connectez-vous pour continuer."
+                        }
+                    });
+                }
 
                 setQuestions(sorted);
             } catch (error) {
@@ -117,9 +137,9 @@ export default function PlayQuizScreen() {
             } finally {
                 if (response && response.data) {
                     let score = response.data.result.score, total = response.data.result.totalPoints, percentage = response.data.result.percentage, pathname = `/quiz/${id}/result`;
-                    
+
                     console.log(response.data, score, total, percentage);
-                    
+
                     router.replace({
                         pathname: pathname.toString(),
                         params: {
@@ -131,7 +151,7 @@ export default function PlayQuizScreen() {
                 }
             }
 
-            await clearQuizProgress(id); 
+            await clearQuizProgress(id);
         } else {
             setCurrentIndex(nextIndex);
             setSelected(null);

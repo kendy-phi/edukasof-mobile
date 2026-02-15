@@ -74,6 +74,26 @@ export function QuizCard({ quiz, onPress, progressPercentage }: Props) {
                             {quiz.difficulty}
                         </Text>
                     </View>
+                    
+                    {/* Premium Badge */}
+                    {quiz.isPremium && (
+                        <View
+                            style={{
+                                position: 'absolute',
+                                top: 12,
+                                left: 12,
+                                backgroundColor: '#f59e0b',
+                                paddingHorizontal: 8,
+                                paddingVertical: 4,
+                                borderRadius: 8,
+                            }}
+                        >
+                            <Text style={{ color: 'white', fontSize: 12 }}>
+                                PREMIUM
+                            </Text>
+                        </View>
+                    )}
+
 
                     {/* Title */}
                     <Text

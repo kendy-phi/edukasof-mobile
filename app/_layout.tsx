@@ -1,8 +1,9 @@
-import { Stack } from "expo-router";
+import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from '@/context/ThemeContext';
+import { Stack } from "expo-router";
 
 export default function RootLayout() {
-    return (
+    return (<AuthProvider>
         <ThemeProvider>
             <Stack
                 screenOptions={{
@@ -10,5 +11,7 @@ export default function RootLayout() {
                 }}
             />
         </ThemeProvider>
+
+    </AuthProvider>
     )
 };

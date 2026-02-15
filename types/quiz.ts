@@ -12,6 +12,7 @@ export type Quiz = {
   totalScore: number;
   session: 'normal' | 'exam';
   isPublished: boolean;
+  isPremium: boolean | false;
   image?: string;
   questionCount?:number;
   user_id: string;
@@ -24,6 +25,8 @@ export interface QuizPreview {
   id: string;
   title: string;
   questionCount: number;
+  isPremium: boolean | false;
+  isPublished: boolean;
   duration: number;
   difficulty?: string;
   category?: string;
