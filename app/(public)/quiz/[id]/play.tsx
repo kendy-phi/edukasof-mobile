@@ -3,6 +3,7 @@ import { nestApi } from '@/api/nest';
 import Screen from '@/components/Screen';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
+import { incrementGuestQuizCount } from '@/utils/guestLimit';
 import { clearQuizProgress, getQuizProgress, saveQuizProgress } from '@/utils/quizProgress';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -135,6 +136,13 @@ export default function PlayQuizScreen() {
                     headers: error.response.headers
                 });
             } finally {
+                if(!isAuthenticated){
+                    await incrementGuestQuizCount();
+                    console.log("Update Guest increment");
+                }else{
+                    console.log("Is auth");
+                    
+                }
                 if (response && response.data) {
                     let score = response.data.result.score, total = response.data.result.totalPoints, percentage = response.data.result.percentage, pathname = `/quiz/${id}/result`;
 

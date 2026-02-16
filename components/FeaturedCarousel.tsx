@@ -1,8 +1,8 @@
-import { ScrollView, View, Text, Pressable } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
 import { useTheme } from '@/context/ThemeContext';
 import { Quiz } from '@/types/quiz';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 
 type Props = {
     quizzes: Quiz[];

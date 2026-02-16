@@ -1,6 +1,11 @@
+import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
+import { getGuestQuizCount } from '@/utils/guestLimit';
 import { deleteQuizzesProgress } from '@/utils/quizProgress';
+import { useEffect, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
+
+
 
 type Props = {
     userName?: string;
@@ -12,6 +17,21 @@ export default function HomeHeader({
     onToggleTheme,
 }: Props) {
     const { theme, mode, toggleTheme } = useTheme();
+    const {isAuthenticated} = useAuth();
+    const [remainging, setRemaining] = useState(0);
+
+    useEffect(() => {
+        const loadCount = async () => {
+            if (!isAuthenticated) {
+                const count = await getGuestQuizCount();
+                console.log("Numbers of remain try: ", count);
+                
+                setRemaining(count);
+            }
+        };
+
+        loadCount();
+    }, []);
 
     const handleToggle = () => {
         if (onToggleTheme) {
@@ -21,7 +41,7 @@ export default function HomeHeader({
         }
     };
 
-    const removeCache = () =>{
+    const removeCache = () => {
         deleteQuizzesProgress();
     };
 
@@ -39,7 +59,7 @@ export default function HomeHeader({
                     color: theme.text,
                 }}
             >
-                Bonjour{userName ? `, ${userName}` : ''} 👋
+                Salut{userName ? `, ${userName}` : ''} 👋
             </Text>
 
             <Text
@@ -50,8 +70,11 @@ export default function HomeHeader({
                     fontWeight: '500',
                 }}
             >
-                Prêt à relever un nouveau défi ?
+                Prêt à relever un nouveau défi ? {
+                    !isAuthenticated ? `Il vous reste ${3 - remainging} quiz gratuits. Connectez-vous pour débloquer un accès illimité.` : ''
+                }
             </Text>
+
 
             {/* Theme Toggle */}
             <Pressable

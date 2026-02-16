@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { resetGuestQuizCount } from './guestLimit';
 
 const KEY = 'QUIZ_PROGRESS';
 
@@ -48,6 +49,7 @@ export const clearQuizProgress = async (quizId: string) => {
 
 export const deleteQuizzesProgress = async () =>{
   await AsyncStorage.removeItem(KEY);
+  await resetGuestQuizCount();
   const saved = await AsyncStorage.getItem(KEY);
   console.log("After cache suppression: ", saved);
   

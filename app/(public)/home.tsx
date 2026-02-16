@@ -1,22 +1,23 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-	ScrollView,
-	RefreshControl,
-	View,
 	ActivityIndicator,
+	RefreshControl,
+	ScrollView,
+	View,
 } from 'react-native';
 
-import Screen from '@/components/Screen';
-import HomeHeader from '@/components/HomeHeader';
-import FeaturedCarousel from '@/components/FeaturedCarousel';
-import CategoryTabs from '@/components/CategoryTabs';
-import { QuizCard } from '@/components/QuizCard';
-import { useTheme } from '@/context/ThemeContext';
-import { useRouter } from 'expo-router';
 import { getQuizzes } from '@/api/quiz';
-import SkeletonFeatured from '@/components/SkeletonFeatured';
+import CategoryTabs from '@/components/CategoryTabs';
+import FeaturedCarousel from '@/components/FeaturedCarousel';
+import HomeHeader from '@/components/HomeHeader';
+import { QuizCard } from '@/components/QuizCard';
+import Screen from '@/components/Screen';
 import SkeletonCard from '@/components/SkeletonCard';
+import SkeletonFeatured from '@/components/SkeletonFeatured';
+import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
 import { getAllQuizProgress } from '@/utils/quizProgress';
+import { useRouter } from 'expo-router';
 
 
 import { Quiz } from '@/types/quiz';
@@ -34,6 +35,7 @@ export default function HomeScreen() {
 	const [loadingMore, setLoadingMore] = useState(false);
 	const [continueQuiz, setContinueQuiz] = useState<any>(null);
 	const [progressMap, setProgressMap] = useState<Record<string, any>>({});
+	const { isAuthenticated } = useAuth();
 
 
 
@@ -49,7 +51,7 @@ export default function HomeScreen() {
 			} else {
 				setQuizzes(response.data);
 			}
-			console.log("Data after loading: ", response.data);
+			console.log("Data rows after loading: ", response.data.length);
 
 			setHasMore(response.data.length > 0);
 		} catch (error) {
@@ -172,7 +174,11 @@ export default function HomeScreen() {
 							key={quiz.id}
 							quiz={quiz}
 							progressPercentage={progressPercentage}
-							onPress={() => router.push(`/quiz/${quiz.id}`)}
+							onPress={() => {
+								if(quiz.isPremium && !isAuthenticated)
+									router.push('/login');
+								router.push(`/quiz/${quiz.id}`)
+							}}
 						/>
 					);
 				})}
