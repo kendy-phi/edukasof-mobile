@@ -1,4 +1,5 @@
 import { useAuth } from '@/context/AuthContext';
+import { router } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 
 export default function Dashboard() {
@@ -20,6 +21,20 @@ export default function Dashboard() {
         }}
       >
         <Text style={{ color: 'white' }}>Logout</Text>
+      </Pressable>
+
+      <Pressable
+        onPress={() =>{
+          router.replace('/home')
+        }}
+        style={{
+          marginTop: 20,
+          backgroundColor: 'blue',
+          padding: 12,
+          borderRadius: 10,
+        }}
+      >
+        <Text style={{ color: 'white' }}>Home</Text>
       </Pressable>
     </View>
   );

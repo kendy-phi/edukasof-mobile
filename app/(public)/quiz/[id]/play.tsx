@@ -4,7 +4,7 @@ import Screen from '@/components/Screen';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { incrementGuestQuizCount } from '@/utils/guestLimit';
-import { clearQuizProgress, getQuizProgress, saveQuizProgress } from '@/utils/quizProgress';
+import { getQuizProgress, saveQuizProgress } from '@/utils/quizProgress';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
@@ -159,7 +159,7 @@ export default function PlayQuizScreen() {
                 }
             }
 
-            await clearQuizProgress(id);
+            // await clearQuizProgress(id);
         } else {
             setCurrentIndex(nextIndex);
             setSelected(null);
@@ -226,7 +226,7 @@ export default function PlayQuizScreen() {
                                         selected === option ? 'white' : theme.text,
                                 }}
                             >
-                                {option ? 'VRAI' : 'FAUX'}
+                                {option == 'True' ? 'VRAI' : 'FAUX'}
                             </Text>
                         </Pressable>
                     ))}

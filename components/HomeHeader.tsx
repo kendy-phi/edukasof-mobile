@@ -17,7 +17,7 @@ export default function HomeHeader({
     onToggleTheme,
 }: Props) {
     const { theme, mode, toggleTheme } = useTheme();
-    const {isAuthenticated} = useAuth();
+    const {isAuthenticated, user} = useAuth();
     const [remainging, setRemaining] = useState(0);
 
     useEffect(() => {
@@ -59,7 +59,7 @@ export default function HomeHeader({
                     color: theme.text,
                 }}
             >
-                Salut{userName ? `, ${userName}` : ''} 👋
+                Salut{isAuthenticated ? `, ${user?.data?.name}` : ''} 👋
             </Text>
 
             <Text

@@ -1,62 +1,49 @@
+import LoginUI from '@/components/LoginUI'; // ← ton design déplacé ici
 import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { ActivityIndicator, Pressable, Text, TextInput, View } from 'react-native';
+import { useTenant } from '@/context/TenantContext';
+import { router } from 'expo-router';
+import React, { useState } from 'react';
+import {
+  Alert
+} from 'react-native';
 
 export default function LoginScreen() {
-  const { login } = useAuth();
-  const router = useRouter();
+  const { login, loading } = useAuth();
+  const { tenant } = useTenant();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Erreur", "Veuillez remplir tous les champs.");
+      return;
+    }
+
     try {
-      setLoading(true);
+      setSubmitting(true);
       await login(email, password);
-      router.replace('/home');
-    } catch (error) {
-      console.log('Login error:', error);
+
+      router.replace('/dashboard');
+    } catch (error: any) {
+      console.error(error);
+      
+      Alert.alert("Erreur", "Email ou mot de passe incorrect.");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
   return (
-    <View style={{ flex: 1, padding: 20, justifyContent: 'center' }}>
-      <TextInput
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        style={{ borderWidth: 1, marginBottom: 12, padding: 12 }}
-      />
-
-      <TextInput
-        placeholder="Password"
-        value={password}
-        secureTextEntry
-        onChangeText={setPassword}
-        style={{ borderWidth: 1, marginBottom: 12, padding: 12 }}
-      />
-
-      <Pressable
-        onPress={handleLogin}
-        style={{
-          backgroundColor: '#2563eb',
-          padding: 14,
-          borderRadius: 12,
-          alignItems: 'center',
-        }}
-      >
-        {loading ? (
-          <ActivityIndicator color="white" />
-        ) : (
-          <Text style={{ color: 'white', fontWeight: '600' }}>
-            Login
-          </Text>
-        )}
-      </Pressable>
-    </View>
+    <LoginUI
+      email={email}
+      setEmail={setEmail}
+      password={password}
+      setPassword={setPassword}
+      handleLogin={handleLogin}
+      loading={submitting}
+      tenant={tenant}
+    />
   );
 }
