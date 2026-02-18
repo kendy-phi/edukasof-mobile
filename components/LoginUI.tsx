@@ -1,17 +1,17 @@
 import { router } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import {
-    ActivityIndicator,
-    Animated,
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Animated,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 // Optional: import { useFonts, DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 // Optional: import { DMSans_300Light, DMSans_400Regular, DMSans_600SemiBold } from '@expo-google-fonts/dm-sans';
@@ -189,7 +189,7 @@ export default function LoginScreen({
           style={styles.forgotRow}
           onPress={() => router.push('/login')}
         >
-          <Text style={styles.forgotText}>Forgot password?</Text>
+          <Text style={styles.forgotText}>Mot de passe oublie?</Text>
         </TouchableOpacity>
 
         {/* Login button */}
@@ -214,7 +214,7 @@ export default function LoginScreen({
           <>
             <View style={styles.divider}>
               <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>New here?</Text>
+              <Text style={styles.dividerText}>Vous n'avez pas de compte?</Text>
               <View style={styles.dividerLine} />
             </View>
 

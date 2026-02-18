@@ -8,64 +8,55 @@ import axios from 'axios';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
   role: string;
-  isActive: boolean;
+  isActive:boolean;
 }
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   isAuthenticated: boolean;
-  register: (name: string, email: string, passowrd: string) => Promise<void>;
+  register: (name: string, email: string, password: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
-//quiz.edukasof.com
-const QUIZ_BASE_URL = "http://192.168.192.6:3250/api/v1";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const QUIZ_BASE_URL = "http://192.168.192.6:3250/api/v1";//"https://quiz.edukasof.com";
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const { tenant } = useTenant();
+  const { tenant, loading: tenantLoading } = useTenant();
 
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   const isAuthenticated = !!user;
 
-  // 🔹 Retourne la bonne URL d'auth selon le type
-  const getAuthBaseURL = (): string => {
-    if (!tenant) throw new Error("No tenant selected");
-
-    if (tenant.type === "full") {
-      if (!tenant.baseURL) {
-        throw new Error("Missing Laravel baseURL");
-      }
-      return tenant.baseURL;
-    }
-
-    return QUIZ_BASE_URL;
-  };
-
-  // 🔄 Auto login au démarrage
+  // 🔥 AUTH INITIALIZATION FIXED
   useEffect(() => {
-    const loadUser = async () => {
-      if (!tenant) {
-        setLoading(false);
-        return;
-      }
+    const initializeAuth = async () => {
 
-      const token = await getToken();
-      if (!token) {
-        setLoading(false);
-        return;
-      }
+      // Wait for tenant to finish loading
+      if (tenantLoading) return;
 
       try {
-        const baseURL = getAuthBaseURL();
+        const token = await getToken();
+
+        if (!token) {
+          setUser(null);
+          return;
+        }
+
+        // Determine baseURL
+        let baseURL = QUIZ_BASE_URL;
+
+        if (tenant?.type === "full" && tenant.baseURL) {
+          baseURL = tenant.baseURL;
+        }
 
         const response = await axios.get(
           `${baseURL}/auth/me`,
@@ -76,46 +67,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           }
         );
 
-        setUser(response.data);
+        setUser(response.data.data ?? response.data);
+
       } catch (error) {
         await clearAllAuthStorage();
         setUser(null);
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     };
 
-    loadUser();
-  }, [tenant]);
+    initializeAuth();
 
-  // 🔐 Login
+  }, [tenant, tenantLoading]);
+
+  // 🔐 LOGIN
   const login = async (email: string, password: string) => {
-    if (!tenant) throw new Error("No tenant selected");
-    let isOk = false;
-    let response = null;
-    const baseURL = getAuthBaseURL();
-    console.log("Login URL: ", `${baseURL}/auth/login`);
-    try {
-      response = await axios.post(
-        `${baseURL}/auth/login`,
-        { email, password }
-      );
-      isOk = true;
-    } catch (error: any) {
+    let baseURL = QUIZ_BASE_URL;
 
-      console.log(error);
-
-    } finally {
-      if (isOk) {
-        const { accessToken, user } = response?.data;
-        console.log(accessToken, user);
-        
-        // console.log("Response data: ", response?.data, "Saved token: ", accessToken);
-
-        await saveToken(accessToken);
-        setUser(user);
-      }
+    if (tenant?.type === "full" && tenant.baseURL) {
+      baseURL = tenant.baseURL;
     }
+
+    const response = await axios.post(
+      `${baseURL}/auth/login`,
+      { email, password }
+    );
+
+    await saveToken(response.data.access_token);
+    setUser(response.data.user ?? response.data);
   };
 
   //Register new quiz account
@@ -136,7 +116,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
 
-  // 🚪 Logout
+  // 🚪 LOGOUT
   const logout = async () => {
     await clearAllAuthStorage();
     setUser(null);
@@ -154,7 +134,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
+    throw new Error("useAuth must be used within AuthProvider");
   }
   return context;
 };

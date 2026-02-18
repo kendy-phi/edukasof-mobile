@@ -1,15 +1,18 @@
-import { getBaseUrl, getToken } from "@/utils/secureStorage";
-import axios from "axios";
+import { getBaseUrl, getToken } from '@/utils/secureStorage';
+import axios from 'axios';
 
-export const createLaravelClient = async () => {
-  const baseURL = await getBaseUrl() || 'https://core.edukasof.com/api/app';
-  const token = await getToken();
+export const laravelClient = axios.create();
 
-  const api = axios.create({ baseURL });
+laravelClient.interceptors.request.use(
+  async (config) => {
+    const baseURL = await getBaseUrl() || 'https://core.edukasof.com/api/app';
+    const token = await getToken();
 
-  if (token) {
-    api.defaults.headers.Authorization = `Bearer ${token}`;
-  }
+    if (baseURL) config.baseURL = baseURL;
+    if (token) config.headers.Authorization = `Bearer ${token}`;
 
-  return api;
-};
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+

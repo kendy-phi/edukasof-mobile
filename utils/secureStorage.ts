@@ -4,6 +4,8 @@ const TOKEN_KEY = 'edukasof_token';
 const BASE_URL_KEY = 'edukasof_base_url';
 const TENANT_NAME_KEY = 'edukasof_tenant_name';
 const TENANT_TYPE_KEY = 'edukasof_tenant_type';
+const QUIZ_PROGRESS_KEY = 'QUIZ_PROGRESS';
+const GUEST_QUIZ_COUNT_KEY = 'GUEST_QUIZ_COUNT';
 
 //TOKEN
 export const saveToken = async (token: string) => {
@@ -41,9 +43,11 @@ export const getTenantName = async () => {
 };
 
 export const clearAllAuthStorage = async () => {
-  await removeToken();
-  await removeBaseUrl();
-  await SecureStore.deleteItemAsync(TENANT_NAME_KEY);
+  [TOKEN_KEY, BASE_URL_KEY, TENANT_NAME_KEY, TENANT_TYPE_KEY, QUIZ_PROGRESS_KEY, GUEST_QUIZ_COUNT_KEY].forEach(async element => {
+    await SecureStore.deleteItemAsync(element);
+    console.log("After cache suppression");
+
+  });
 };
 
 export const saveTenantType = async (type: string) => {

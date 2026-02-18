@@ -20,7 +20,8 @@ export default function Index() {
 
     // 🏫 Tenant déjà sélectionné → login
     if (tenant) {
-      router.replace('/login');
+      console.log(tenant, isAuthenticated)
+      router.replace('/home');
       return;
     }
 

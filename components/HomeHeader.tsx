@@ -2,6 +2,8 @@ import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { getGuestQuizCount } from '@/utils/guestLimit';
 import { deleteQuizzesProgress } from '@/utils/quizProgress';
+import { clearAllAuthStorage } from '@/utils/secureStorage';
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
@@ -17,7 +19,7 @@ export default function HomeHeader({
     onToggleTheme,
 }: Props) {
     const { theme, mode, toggleTheme } = useTheme();
-    const {isAuthenticated, user} = useAuth();
+    const { isAuthenticated, user } = useAuth();
     const [remainging, setRemaining] = useState(0);
 
     useEffect(() => {
@@ -25,7 +27,7 @@ export default function HomeHeader({
             if (!isAuthenticated) {
                 const count = await getGuestQuizCount();
                 console.log("Numbers of remain try: ", count);
-                
+
                 setRemaining(count);
             }
         };
@@ -59,7 +61,7 @@ export default function HomeHeader({
                     color: theme.text,
                 }}
             >
-                Salut{isAuthenticated ? `, ${user?.data?.name}` : ''} 👋
+                Salut{isAuthenticated ? `, ${user?.name}` : ''} 👋
             </Text>
 
             <Text
@@ -75,55 +77,89 @@ export default function HomeHeader({
                 }
             </Text>
 
+            <View style={{
+                flexDirection: 'row',
+                justifyContent: 'flex-start'
+            }}>
 
-            {/* Theme Toggle */}
-            <Pressable
-                onPress={handleToggle}
-                style={{
-                    marginTop: 16,
-                    paddingVertical: 8,
-                    paddingHorizontal: 14,
-                    borderRadius: 12,
-                    backgroundColor: theme.card,
-                    borderWidth: 1,
-                    borderColor: theme.border,
-                    alignSelf: 'flex-start',
-                }}
-            >
-                <Text
+                {/* Theme Toggle */}
+                <Pressable
+                    onPress={handleToggle}
                     style={{
-                        color: theme.text,
-                        fontWeight: '600',
-                        fontSize: 14,
+                        marginTop: 16,
+                        paddingVertical: 8,
+                        paddingHorizontal: 14,
+                        borderRadius: 12,
+                        backgroundColor: theme.card,
+                        borderWidth: 1,
+                        borderColor: theme.border,
+                        alignSelf: 'flex-start',
+                        marginRight: 10
                     }}
                 >
-                    {mode === 'light' ? '🌙 Mode sombre' : '☀️ Mode clair'}
-                </Text>
-            </Pressable>
-            {/* clear cache to remove */}
-            <Pressable
-                onPress={deleteQuizzesProgress}
-                style={{
-                    marginTop: 16,
-                    paddingVertical: 8,
-                    paddingHorizontal: 14,
-                    borderRadius: 12,
-                    backgroundColor: theme.card,
-                    borderWidth: 1,
-                    borderColor: theme.border,
-                    alignSelf: 'flex-start',
-                }}
-            >
-                <Text
+                    <Text
+                        style={{
+                            color: theme.text,
+                            fontWeight: '600',
+                            fontSize: 14,
+                        }}
+                    >
+                        {mode === 'light' ? '🌙 Mode sombre' : '☀️ Mode clair'}
+                    </Text>
+                </Pressable>
+
+                {/* clear cache to remove */}
+                <Pressable
+                    onPress={clearAllAuthStorage}
                     style={{
-                        color: theme.text,
-                        fontWeight: '600',
-                        fontSize: 14,
+                        marginTop: 16,
+                        paddingVertical: 8,
+                        paddingHorizontal: 14,
+                        borderRadius: 12,
+                        backgroundColor: theme.card,
+                        borderWidth: 1,
+                        borderColor: theme.border,
+                        alignSelf: 'flex-start',
+                        marginRight: 10
                     }}
                 >
-                    supprimer les caches
-                </Text>
-            </Pressable>
+                    <Text
+                        style={{
+                            color: theme.text,
+                            fontWeight: '600',
+                            fontSize: 14,
+                        }}
+                    >
+                        🧼 caches
+                    </Text>
+                </Pressable>
+
+                {!isAuthenticated && (
+                    <Pressable
+                        onPress={() =>{ router.replace('/login') }}
+                        style={{
+                            marginTop: 16,
+                            paddingVertical: 8,
+                            paddingHorizontal: 14,
+                            borderRadius: 12,
+                            backgroundColor: theme.card,
+                            borderWidth: 1,
+                            borderColor: theme.border,
+                            alignSelf: 'flex-start',
+                        }}
+                    >
+                        <Text
+                            style={{
+                                color: theme.text,
+                                fontWeight: '600',
+                                fontSize: 14,
+                            }}
+                        >
+                            🔐 Se connecter
+                        </Text>
+                    </Pressable>
+                )}
+            </View>
         </View>
     );
 }

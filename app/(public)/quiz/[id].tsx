@@ -89,7 +89,7 @@ export default function QuizDetailScreen() {
           <Text>⏱️ Duration: {quiz.duration} minutes</Text>
           <Text>🎯 Passing score: {quiz.passingScore}%</Text>
           <Text>🏆 Total score: {quiz.totalScore}</Text>
-          <Text>Number of reached {reached}</Text>
+          <Text>{ !isAuthenticated ? `Number of reached ${reached}` : '' }</Text>
         </View>
         <LimitModal
           visible={showLimitModal}

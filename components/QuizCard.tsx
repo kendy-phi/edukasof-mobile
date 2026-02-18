@@ -11,7 +11,7 @@ type Props = {
 };
 
 
-const DIFFICULTY_COLORS: Record<string, string[]> = {
+const DIFFICULTY_COLORS: Record<string, [string, string]> = {
     Low: ['#34d399', '#059669'],
     Medium: ['#22d3ee', '#0891b2'],
     Hard: ['#f97316', '#ea580c'],
@@ -19,7 +19,7 @@ const DIFFICULTY_COLORS: Record<string, string[]> = {
 
 export function QuizCard({ quiz, onPress, progressPercentage }: Props) {
     const gradient = DIFFICULTY_COLORS[quiz.difficulty] ?? ['#38bdf8', '#0284c7'];
-    // console.log("print quiz difficulty: ", quiz.difficulty);
+    // console.log("print quiz percentage: ", progressPercentage);
 
     return (
         <Pressable
@@ -30,6 +30,7 @@ export function QuizCard({ quiz, onPress, progressPercentage }: Props) {
                 shadowOpacity: pressed ? 0.1 : 0.05,
                 shadowRadius: 12,
                 shadowOffset: { width: 0, height: 6 },
+                marginBottom: 20
             })}
         >
             <View
@@ -121,6 +122,18 @@ export function QuizCard({ quiz, onPress, progressPercentage }: Props) {
 
                 {/* ===== BOTTOM ===== */}
                 <View style={{ padding: 16 }}>
+                    {/* Description */}
+                    <Text
+                        style={{
+                            flex: 1,
+                            color: '#64748b',
+                            fontSize: 14,
+                            fontWeight: '500',
+                            marginBottom: 10
+                        }}
+                    >
+                    {quiz.description ?? ''}
+                    </Text>
                     <View
                         style={{
                             flexDirection: 'row',
@@ -129,6 +142,7 @@ export function QuizCard({ quiz, onPress, progressPercentage }: Props) {
                             marginBottom: 12,
                         }}
                     >
+
                         {/* Duration */}
                         <Text
                             style={{
