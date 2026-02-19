@@ -1,16 +1,16 @@
 import {
-    getBaseUrl,
-    getTenantName,
-    getTenantType,
-    saveBaseUrl,
-    saveTenantName,
-    saveTenantType,
+  getBaseUrl,
+  getTenantName,
+  getTenantType,
+  saveBaseUrl,
+  saveTenantName,
+  saveTenantType,
 } from '@/utils/secureStorage';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 type InstitutionType = "full" | "independent";
 
-interface Tenant {
+export interface Tenant {
   type: InstitutionType;
   name: string;
   baseURL?: string; // optionnel maintenant

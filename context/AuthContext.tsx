@@ -94,7 +94,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       { email, password }
     );
 
-    await saveToken(response.data.access_token);
+    await saveToken(response.data.accessToken);
     setUser(response.data.user ?? response.data);
   };
 
@@ -105,13 +105,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     password: string
   ) => {
     const response = await axios.post(
-      `${QUIZ_BASE_URL}/api/auth/register`,
+      `${QUIZ_BASE_URL}/auth/register`,
       { name, email, password }
     );
 
-    const { access_token, user } = response.data;
+    const { accessToken, user } = response.data;
 
-    await saveToken(access_token);
+    await saveToken(accessToken);
     setUser(user);
   };
 

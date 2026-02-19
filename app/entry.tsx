@@ -22,14 +22,18 @@ export default function EntryScreen() {
   const router = useRouter();
   const { setTenant } = useTenant();
 
-  const handleSchool = () => {
-    router.push('/select-school');
+  const handleSchool = async () => {
+    await setTenant({
+      type: "full",
+      name: "EdukasoF Global",
+    });
+    router.push('/login');
   };
 
   const handleIndependent = async () => {
     await setTenant({
       type: "independent",
-      name: "EdukasoF Global",
+      name: "EdukasoF Quiz",
     });
 
     router.replace('/home');
@@ -39,56 +43,45 @@ export default function EntryScreen() {
     <View style={styles.container}>
 
       {/* Logo */}
-      <View style={{ alignItems: 'center', marginBottom: 20 }}>
+      <View style={styles.logoWrapper}>
         <Image
           source={require('@/assets/images/splash.png')}
-          style={{
-            width: 200,
-            height: 200,
-            borderRadius: 20,
-          }}
+          style={styles.logo}
         />
       </View>
 
       {/* Heading */}
-      <View style={styles.logoWrapper}>
-        <Text style={styles.title}>Bienvenue</Text>
+      <View style={styles.headingWrapper}>
+        <Text style={styles.heading}>Bienvenue</Text>
         <Text style={styles.subtitle}>
-          Choisissez votre mode d’utilisation
+          Choisissez comment vous souhaitez utiliser Edukasof
         </Text>
       </View>
 
-      {/* Cards */}
-      <View style={styles.cardWrapper}>
+      {/* Buttons */}
+      <View style={styles.buttonWrapper}>
 
         <Pressable
           onPress={handleSchool}
           style={({ pressed }) => [
-            styles.card,
-            pressed && styles.cardPressed
+            styles.secondaryButton,
+            pressed && styles.buttonPressed,
           ]}
         >
-          <Text style={styles.cardTitle}>
+          <Text style={styles.secondaryButtonText}>
             🎓 Mon école utilise Edukasof
-          </Text>
-          <Text style={styles.cardDescription}>
-            Accédez à votre espace académique et vos évaluations.
           </Text>
         </Pressable>
 
         <Pressable
           onPress={handleIndependent}
           style={({ pressed }) => [
-            styles.card,
-            styles.primaryCard,
-            pressed && styles.cardPressed
+            styles.primaryButton,
+            pressed && styles.buttonPressed,
           ]}
         >
-          <Text style={styles.primaryCardTitle}>
+          <Text style={styles.primaryButtonText}>
             🧠 Utiliser Edukasof Quiz
-          </Text>
-          <Text style={styles.primaryCardDescription}>
-            Passez des quiz et améliorez vos compétences.
           </Text>
         </Pressable>
 
@@ -103,98 +96,77 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: C.bg,
     paddingHorizontal: 28,
-    paddingVertical: 60,
-    justifyContent: 'space-between',
+    justifyContent: 'center',
   },
 
   logoWrapper: {
     alignItems: 'center',
+    marginBottom: 40,
   },
 
-  logoBox: {
-    width: 60,
-    height: 60,
-    borderRadius: 16,
-    backgroundColor: C.accent,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-  },
-
-  logoText: {
-    color: '#fff',
-    fontSize: 28,
-    fontWeight: '700',
-  },
-
-  brand: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: C.text,
+  logo: {
+    width: 180,
+    height: 180,
+    resizeMode: 'contain',
   },
 
   headingWrapper: {
-    marginTop: 40,
-    textAlign: 'center',
-    borderColor: 'black'
+    alignItems: 'center',
+    marginBottom: 50,
   },
 
-  title: {
-    fontSize: 28,
+  heading: {
+    fontSize: 30,
     fontWeight: '700',
     color: C.text,
-    marginBottom: 6,
+    marginBottom: 8,
   },
 
   subtitle: {
     fontSize: 14,
     color: C.muted,
+    textAlign: 'center',
+    paddingHorizontal: 10,
   },
 
-  cardWrapper: {
-    marginTop: 40,
-    gap: 16,
+  buttonWrapper: {
+    gap: 18,
   },
 
-  card: {
-    backgroundColor: C.surface,
-    padding: 22,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: C.border,
-  },
-
-  primaryCard: {
+  primaryButton: {
     backgroundColor: C.accent,
-    borderColor: C.accent,
+    paddingVertical: 18,
+    borderRadius: 14,
+    alignItems: 'center',
+    shadowColor: C.accent,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 14,
+    elevation: 4,
   },
 
-  cardPressed: {
-    opacity: 0.9,
-    transform: [{ scale: 0.98 }],
-  },
-
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: C.text,
-    marginBottom: 6,
-  },
-
-  cardDescription: {
-    fontSize: 13,
-    color: C.muted,
-  },
-
-  primaryCardTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+  primaryButtonText: {
     color: '#fff',
-    marginBottom: 6,
+    fontSize: 15,
+    fontWeight: '600',
   },
 
-  primaryCardDescription: {
-    fontSize: 13,
-    color: '#e0ecff',
+  secondaryButton: {
+    borderWidth: 1.5,
+    borderColor: C.border,
+    paddingVertical: 18,
+    borderRadius: 14,
+    alignItems: 'center',
+  },
+
+  secondaryButtonText: {
+    color: C.text,
+    fontSize: 15,
+    fontWeight: '600',
+  },
+
+  buttonPressed: {
+    transform: [{ scale: 0.97 }],
+    opacity: 0.9,
   },
 });

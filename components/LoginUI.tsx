@@ -1,3 +1,4 @@
+import { Tenant } from '@/context/TenantContext';
 import { router } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import {
@@ -30,10 +31,6 @@ const C = {
   error:        '#dc2626',   // rouge erreur
   accentGlow:   'rgba(37,99,235,0.15)',
 };
-
-
-
-
 
 // ─── Subcomponents ────────────────────────────────────────────────────────────
 
@@ -116,6 +113,12 @@ const IconEmail = () => (
 const IconLock = () => (
   <Text style={{ color: C.muted, fontSize: 15 }}>🔒</Text>
 );
+const IconWeb = () => (
+  <Text style={{color: C.muted, fontSize: 15 }}>🌐</Text>
+);
+const IconUser = () => (
+  <Text style={{color: C.muted, fontSize: 15 }}>👤</Text>
+)
 
 // ─── Main Screen ──────────────────────────────────────────────────────────────
 
@@ -125,15 +128,21 @@ type Props = {
   password: string;
   setPassword: (v: string) => void;
   handleLogin: () => void;
+  handleRegister: () => void;
   loading: boolean;
-  tenant?: { type: string };
+  tenant?: Tenant | null;
+  school: string;
+  setSchool: (v: string) => void;
+  name: string;
+  setName: (v: string) => void;
 };
 
 export default function LoginScreen({
   email, setEmail, password, setPassword,
-  handleLogin, loading, tenant,
+  handleLogin, handleRegister, loading, tenant, school, setSchool, name, setName
 }: Props) {
   const [showPassword, setShowPassword] = useState(false);
+  const [showName, setShowName] = useState(false);
 
   return (
     <KeyboardAvoidingView
@@ -153,6 +162,26 @@ export default function LoginScreen({
         {/* Heading */}
         <Text style={styles.heading}>Bon retour</Text>
         <Text style={styles.subtitle}>Connectez-vous pour débloquer un accès illimité</Text>
+
+        {/* Fields */}
+        {tenant?.type === 'full' && ( <Field
+          label="ECOLE"
+          value={school}
+          onChangeText={setSchool}
+          placeholder="Url fourni par votre établissement"
+          icon={<IconWeb />}
+        />)}
+
+        {showName && (
+          <Field
+          label="Pseudo"
+            value={name}
+            onChangeText={setName}
+            placeholder="Votre nom d'utilisateur"
+            icon={<IconUser />}
+          />
+        )}
+        
 
         {/* Fields */}
         <Field
@@ -194,7 +223,7 @@ export default function LoginScreen({
 
         {/* Login button */}
         <Pressable
-          onPress={handleLogin}
+          onPress={!showName ? handleLogin : handleRegister}
           disabled={loading}
           style={({ pressed }) => [
             styles.btnLogin,
@@ -205,7 +234,7 @@ export default function LoginScreen({
           {loading ? (
             <ActivityIndicator color={C.bg} size="small" />
           ) : (
-            <Text style={styles.btnLoginText}>Sign in</Text>
+            <Text style={styles.btnLoginText}>{!showName ? 'Connecté' : 'Enregistré'}</Text>
           )}
         </Pressable>
 
@@ -219,13 +248,13 @@ export default function LoginScreen({
             </View>
 
             <Pressable
-              onPress={() => router.push('/register')}
+              onPress={() => setShowName(!showName)}
               style={({ pressed }) => [
                 styles.btnRegister,
                 pressed && styles.btnRegisterPressed,
               ]}
             >
-              <Text style={styles.btnRegisterText}>Créer un compte</Text>
+              <Text style={styles.btnRegisterText}>{showName ? 'Connecté' : 'Créer un compte'}</Text>
             </Pressable>
           </>
         )}
