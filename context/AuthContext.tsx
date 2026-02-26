@@ -1,140 +1,137 @@
+// context/AuthContext.tsx
+
+import { createServices } from '@/api/services';
+import { ENV } from '@/config/env';
 import { useTenant } from '@/context/TenantContext';
 import {
-  clearAllAuthStorage,
-  getToken,
-  saveToken,
+    clearAllAuthStorage,
+    getToken,
+    saveTokens,
 } from '@/utils/secureStorage';
-import axios from 'axios';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, {
+    createContext,
+    useContext,
+    useEffect,
+    useMemo,
+    useState,
+} from 'react';
 
 interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  isActive:boolean;
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    isActive: boolean;
 }
 
 interface AuthContextType {
-  user: User | null;
-  loading: boolean;
-  isAuthenticated: boolean;
-  register: (name: string, email: string, password: string) => Promise<void>;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
+    user: User | null;
+    loading: boolean;
+    isAuthenticated: boolean;
+    services: ReturnType<typeof createServices> | null;
+    login: (email: string, password: string) => Promise<void>;
+    register: (name:string, email: string, password: string) => Promise<void>;
+    logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const QUIZ_BASE_URL = "http://192.168.192.6:3250/api/v1";//"https://quiz.edukasof.com";
-
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const { tenant, loading: tenantLoading } = useTenant();
+    const { tenant, loading: tenantLoading } = useTenant();
 
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(true);
 
-  const isAuthenticated = !!user;
+    const isAuthenticated = !!user;
 
-  // 🔥 AUTH INITIALIZATION FIXED
-  useEffect(() => {
-    const initializeAuth = async () => {
-
-      // Wait for tenant to finish loading
-      if (tenantLoading) return;
-
-      try {
-        const token = await getToken();
-
-        if (!token) {
-          setUser(null);
-          return;
-        }
-
-        // Determine baseURL
-        let baseURL = QUIZ_BASE_URL;
-
+    // 🔥 Determine correct backend per school
+    const baseURL = useMemo(() => {
         if (tenant?.type === "full" && tenant.baseURL) {
-          baseURL = tenant.baseURL;
+            return tenant.baseURL;
         }
+        return ENV.NEST_API;
+    }, [tenant]);
 
-        const response = await axios.get(
-          `${baseURL}/auth/me`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+    // 🔥 Create tenant-aware services
+    const services = useMemo(() => {
+        if (!baseURL) return null;
+        return createServices(baseURL);
+    }, [baseURL]);
 
-        setUser(response.data.data ?? response.data);
+    // 🔄 Initialize Auth
+    useEffect(() => {
+        const initializeAuth = async () => {
+            if (tenantLoading || !services) return;           
 
-      } catch (error) {
-        await clearAllAuthStorage();
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
+            try {
+                const token = await getToken();
+                if (!token) {
+                    setUser(null);
+                    return;
+                }
+
+                const userData = await services.auth.getProfile();
+                console.log("User data ==> ", userData);
+                setUser(userData.data ?? userData);
+            } catch (error) {
+                console.log("User data ==> ", error);
+                await clearAllAuthStorage();
+                setUser(null);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        initializeAuth();
+    }, [services, tenantLoading]);
+
+    // 🔐 LOGIN
+    const login = async (email: string, password: string) => {
+        if (!services) return;
+
+        const data = await services.auth.login({email, password});
+
+        await saveTokens(data.accessToken, data.refreshToken);
+        setUser(data.user ?? data);
     };
 
-    initializeAuth();
+    // 🔐 REGISTER
+    const register = async (name:string, email: string, password: string) => {
+        if (!services) return;
 
-  }, [tenant, tenantLoading]);
+        const data = await services.auth.register({name, email, password});
 
-  // 🔐 LOGIN
-  const login = async (email: string, password: string) => {
-    let baseURL = QUIZ_BASE_URL;
+        await saveTokens(data.accessToken, data.refreshToken);
+        setUser(data.user ?? data);
+    };
 
-    if (tenant?.type === "full" && tenant.baseURL) {
-      baseURL = tenant.baseURL;
-    }
+    // 🚪 LOGOUT
+    const logout = async () => {
+        await clearAllAuthStorage();
+        setUser(null);
+    };
 
-    const response = await axios.post(
-      `${baseURL}/auth/login`,
-      { email, password }
+    return (
+        <AuthContext.Provider
+            value={{
+                user,
+                loading,
+                isAuthenticated,
+                services,
+                login,
+                register,
+                logout,
+            }}
+        >
+            {children}
+        </AuthContext.Provider>
     );
-
-    await saveToken(response.data.accessToken);
-    setUser(response.data.user ?? response.data);
-  };
-
-  //Register new quiz account
-  const register = async (
-    name: string,
-    email: string,
-    password: string
-  ) => {
-    const response = await axios.post(
-      `${QUIZ_BASE_URL}/auth/register`,
-      { name, email, password }
-    );
-
-    const { accessToken, user } = response.data;
-
-    await saveToken(accessToken);
-    setUser(user);
-  };
-
-
-  // 🚪 LOGOUT
-  const logout = async () => {
-    await clearAllAuthStorage();
-    setUser(null);
-  };
-
-  return (
-    <AuthContext.Provider
-      value={{ user, loading, isAuthenticated, register, login, logout }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within AuthProvider");
-  }
-  return context;
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error("useAuth must be used within AuthProvider");
+    }
+    return context;
 };
