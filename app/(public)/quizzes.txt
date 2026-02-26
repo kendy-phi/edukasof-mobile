@@ -1,39 +1,44 @@
+// import { getQuizzes } from '@/api/quiz';
 import Screen from '@/components/Screen';
-import { getAllQuizProgress } from '@/utils/quizProgress';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { FlatList } from 'react-native';
-import { nestApi } from '../../api/nest';
 import { QuizCard } from '../../components/QuizCard';
 import { Quiz } from '../../types/quiz';
-export default function QuizzesScreen() {
+
+export default function QuizzesScreens() {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [quizProgressMap, setQuizProgressMap] = useState<Record<string, number>>({});
+  // const {services} = useAuth();
 
 
-  useEffect(() => {
-    nestApi.get<Quiz[]>('/quiz').then(res => {
-      console.log(res.data);
 
-      setQuizzes(res.data.filter(q => q.isPublished));
-    });
+  useEffect( () => {
+    const loadQuizzes = () => {
+      console.log("loadig service is calling: ");
+      
+      // const data = await services?.quiz.getQuizzes(); //getQuizzes();
+      // console.log("Data response from loaded quizzes: ", data);
+      // setQuizzes(data);
+    }
+
+    loadQuizzes();    
   }, []);
 
   useEffect(() => {
     const loadProgress = async () => {
-      const saved = await getAllQuizProgress();
+      // const saved = await getAllQuizProgress();
 
-      if (!saved) {
-        setQuizProgressMap({});
-        return;
-      }
+      // if (!saved) {
+      //   setQuizProgressMap({});
+      //   return;
+      // }
 
-      setQuizProgressMap(JSON.parse(saved));
+      // setQuizProgressMap(JSON.parse(saved));
     };
 
     loadProgress();
   }, []);
-
 
   return (
     <Screen>

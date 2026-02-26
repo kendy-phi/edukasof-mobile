@@ -6,7 +6,6 @@ import {
 	View,
 } from 'react-native';
 
-import { getQuizzes } from '@/api/quiz';
 import CategoryTabs from '@/components/CategoryTabs';
 import FeaturedCarousel from '@/components/FeaturedCarousel';
 import HomeHeader from '@/components/HomeHeader';
@@ -36,6 +35,7 @@ export default function HomeScreen() {
 	const [continueQuiz, setContinueQuiz] = useState<any>(null);
 	const [progressMap, setProgressMap] = useState<Record<string, any>>({});
 	const { isAuthenticated } = useAuth();
+	const { services } = useAuth();
 
 
 
@@ -44,7 +44,7 @@ export default function HomeScreen() {
 	// 🔹 Fetch quizzes
 	const loadQuizzes = async (pageNumber = 1, append = false) => {
 		try {
-			const response = await getQuizzes(pageNumber, 10);
+			const response = await services?.quiz.load(pageNumber, 10); //await getQuizzes();
 
 			if (append) {
 				setQuizzes(prev => [...prev, ...response.data]);

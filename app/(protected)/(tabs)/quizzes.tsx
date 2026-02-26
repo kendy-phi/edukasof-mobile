@@ -13,9 +13,9 @@ export default function QuizzesScreen() {
 
   useEffect(() => {
     nestApi.get<Quiz[]>('/quiz').then(res => {
-      // console.log(res.data);
+      console.log(res.data);
 
-      setQuizzes(res.data.filter(q => q.isPublished));
+      // setQuizzes(res.data.filter(q => q.isPublished));
     });
   }, []);
 
