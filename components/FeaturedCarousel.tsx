@@ -8,20 +8,19 @@ type Props = {
     quizzes: Quiz[];
 };
 
+const DIFFICULTY_COLORS: Record<string, [string, string]> = {
+    Low: ['#34d399', '#059669'],
+    Medium: ['#22d3ee', '#0891b2'],
+    Hard: ['#f97316', '#ea580c'],
+};
+
 export default function FeaturedCarousel({ quizzes }: Props) {
     const { theme, mode } = useTheme();
     const router = useRouter();
 
     if (!quizzes.length) return null;
 
-    const getGradient = (difficulty?: string) => {
-        if (difficulty === 'Low') return ['#22c55e', '#15803d'];
-        if (difficulty === 'Medium') return ['#22d3ee', '#0369a1'];
-        if (difficulty === 'Hard') return ['#fb923c', '#c2410c'];
-        return mode === 'dark'
-            ? ['#334155', '#1e293b']
-            : ['#3b82f6', '#2563eb'];
-    };
+    // const gradient = DIFFICULTY_COLORS[quiz.difficulty] ?? ['#38bdf8', '#0284c7'];
 
     return (
         <View style={{ marginBottom: 32 }}>
@@ -52,7 +51,7 @@ export default function FeaturedCarousel({ quizzes }: Props) {
                         })}
                     >
                         <LinearGradient
-                            colors={getGradient(quiz.difficulty)}
+                            colors={DIFFICULTY_COLORS[quiz.difficulty] ?? ['#38bdf8', '#0284c7']}
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 1 }}
                             style={{
