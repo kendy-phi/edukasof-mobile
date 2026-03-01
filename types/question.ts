@@ -12,3 +12,10 @@ export type Question = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type Answer = {
+    attemptId: string;
+    questionId: string;
+    studentAnswer: string[];
+
+};

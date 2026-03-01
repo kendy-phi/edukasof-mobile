@@ -1,3 +1,4 @@
+import { Answer } from '@/types/question';
 import { AxiosInstance } from 'axios';
 
 export const quizApi = (api: AxiosInstance) => ({
@@ -30,13 +31,15 @@ export const quizApi = (api: AxiosInstance) => ({
         return response.data;
     },
 
-    staredtQuiz: async () => {
-        const response = await api.post(`/quiz-attempts/start`);
+    startQuiz: async (quizId: string) => {
+        const response = await api.post(`/quiz-attempts/start`,{
+            quizId
+        });
         return response.data;
     },
     
-    finishedQuiz: async (id: string) => {
-        const response = await api.post(`/quiz-attempts/${id}/finish`);
+    finishedQuiz: async (id: string, data:{score:number, totalQuestions: number}) => {
+        const response = await api.patch(`/quiz-attempts/${id}/finish`, data);
         return response.data;    
     },
     
@@ -48,6 +51,13 @@ export const quizApi = (api: AxiosInstance) => ({
     loadQuestion: async (attempId: string) => {
         const response = await api.post(`/quiz-attempts/${attempId}`);   
         return response.data;
+    },
+
+    storeAnswers: async (answers: Answer[]) => {
+        console.log("aswer to send: ", answers);
+        const response = await api.post(`/answers/bulk/`, answers);
+        return response.data;
     }
+    
 
 });

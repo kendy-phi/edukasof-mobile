@@ -33,6 +33,7 @@ export const createApiClient = (tenantUrl: string) => {
     // 🔥 Automatically attach token
     api.interceptors.request.use(async (config) => {
         const token = await getToken();
+        console.log("Add token to header", token);
 
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
@@ -99,15 +100,26 @@ export const createApiClient = (tenantUrl: string) => {
                 } finally {
                     isRefreshing = false;
                 }
-            }else if(error?.response?.status === 402){
+            } else if (error?.response?.status === 402) {
                 Alert.alert("Access!", "Vous n'avez pas accès avec la resource demander.");
-            }else if (error?.response?.status >= 500){
+            } else if (error?.response?.status >= 500) {
                 // Cas 2 : Erreur serveur générique (500)
                 Alert.alert("Erreur Serveur", "Un problème est survenu sur nos serveurs.");
                 console.log("Error status: ", error?.response?.status)
-            }else{
+            } else {
                 // Cas 3 : Problème de connexion (Pas de réponse du serveur)
-                Alert.alert("Erreur Réseau", "Vérifiez votre connexion internet.");
+                const rawMessage = error?.response?.data?.message;
+
+                // Sécurité : join() ne fonctionne que sur un tableau
+                const message = Array.isArray(rawMessage)
+                    ? rawMessage.join(', ')
+                    : rawMessage; // Si c'est une string, on la garde telle quelle
+
+                Alert.alert(
+                    "Erreur Réseau",
+                    message || "Le serveur ne répond pas. Vérifiez votre connexion."
+                );
+                console.log("Erreur :", message || "Pas de message");
             }
 
             return Promise.reject(error);
