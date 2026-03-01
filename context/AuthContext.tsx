@@ -3,6 +3,7 @@
 import { createServices } from '@/api/services';
 import { ENV } from '@/config/env';
 import { useTenant } from '@/context/TenantContext';
+import { User } from '@/types/user';
 import {
     clearAllAuthStorage,
     getToken,
@@ -15,14 +16,6 @@ import React, {
     useMemo,
     useState,
 } from 'react';
-
-interface User {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-    isActive: boolean;
-}
 
 interface AuthContextType {
     user: User | null;

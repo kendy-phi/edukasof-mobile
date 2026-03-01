@@ -1,6 +1,7 @@
 import { ENV } from "@/config/env";
 import { clearAllAuthStorage, getRefreshToken, getToken, saveTokens } from "@/utils/secureStorage";
 import axios from "axios";
+import { router } from "expo-router";
 import { Alert } from "react-native";
 
 export const createApiClient = (tenantUrl: string) => {
@@ -33,7 +34,7 @@ export const createApiClient = (tenantUrl: string) => {
     // 🔥 Automatically attach token
     api.interceptors.request.use(async (config) => {
         const token = await getToken();
-        console.log("Add token to header", token);
+        // console.log("Add token to header", token);
 
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
@@ -94,7 +95,7 @@ export const createApiClient = (tenantUrl: string) => {
                     Alert.alert(
                         "Session expirée",
                         "Veuillez vous reconnecter pour continuer.",
-                        [{ text: "OK", onPress: () => { /* Logique de déconnexion/redirection */ } }]
+                        [{ text: "OK", onPress: () => { router.push('/login') } }]
                     );
                     return Promise.reject(refreshError);
                 } finally {

@@ -91,6 +91,9 @@ export default function HomeScreen() {
 	const loadMore = async () => {
 		if (!hasMore || loadingMore) return;
 
+		if(isAuthenticated)
+			router.replace('/(protected)/(tabs)/quizzes');
+
 		setLoadingMore(true);
 
 		const nextPage = page + 1;

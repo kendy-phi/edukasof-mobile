@@ -31,6 +31,7 @@ export default function FeaturedCarousel({ quizzes }: Props) {
                     fontWeight: '800',
                     color: theme.text,
                     marginBottom: 16,
+                    paddingTop: 50
                 }}
             >
                 🔥 À la une

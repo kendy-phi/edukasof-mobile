@@ -8,7 +8,6 @@ import {
 
 import CategoryTabs from '@/components/CategoryTabs';
 import FeaturedCarousel from '@/components/FeaturedCarousel';
-import HomeHeader from '@/components/HomeHeader';
 import { QuizCard } from '@/components/QuizCard';
 import Screen from '@/components/Screen';
 import SkeletonCard from '@/components/SkeletonCard';
@@ -122,7 +121,7 @@ export default function HomeScreen() {
   if (loading) {
     return (
       <Screen>
-        <HomeHeader />
+        {/* <HomeHeader /> */}
         <SkeletonFeatured />
 
         {[1, 2, 3, 4].map((_, i) => (
@@ -134,8 +133,8 @@ export default function HomeScreen() {
 
 
   return (
-    <Screen>
       <ScrollView
+        style={{padding:5}}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -156,8 +155,9 @@ export default function HomeScreen() {
           }
         }}
       >
-        {/* HEADER */}
+        {/* HEADER 
         <HomeHeader />
+        */}
 
         {/* FEATURED */}
         <FeaturedCarousel quizzes={quizzes.slice(0, 3)} />
@@ -201,10 +201,6 @@ export default function HomeScreen() {
             <ActivityIndicator size="small" color={theme.primary} />
           </View>
         )}
-
-        {/* Bottom spacing */}
-        <View style={{ height: 40 }} />
       </ScrollView>
-    </Screen>
   );
 }

@@ -47,7 +47,7 @@ export default function Dashboard() {
         // console.log("Quiz statistic:", stats);
 
 
-        const history = await services?.dashboard?.getQuizHistory();console.log(history);
+        const history = await services?.dashboard?.getQuizHistory();//console.log(history);
          //getQuizHistory();
         setQuizHistory(history);
 
@@ -161,7 +161,7 @@ export default function Dashboard() {
       </View>
       {/* take quiz */}
       <View style={styles.actions}>
-        <Pressable style={styles.primaryButton} onPress={() => { router.replace('/home') }}>
+        <Pressable style={styles.primaryButton} onPress={() => { router.replace('/(protected)/(tabs)/quizzes') }}>
           <Text style={styles.primaryText}> Lister Quiz</Text>
         </Pressable>
       </View>
@@ -278,3 +278,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
 });
+function getSchoolDashboard() {
+  throw new Error('Function not implemented.');
+}
+

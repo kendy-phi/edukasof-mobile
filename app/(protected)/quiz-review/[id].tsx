@@ -93,7 +93,7 @@ export default function QuizReview() {
                     <Text style={styles.primaryText}> Tableau de bord</Text>
                 </Pressable>
 
-                <Pressable style={styles.secondaryButton} onPress={() =>{ router.replace('/home')}}>
+                <Pressable style={styles.secondaryButton} onPress={() =>{ router.replace('/(protected)/(tabs)/quizzes')}}>
                     <Text style={styles.secondaryText}> Lister Quiz</Text>
                 </Pressable>
             </View>

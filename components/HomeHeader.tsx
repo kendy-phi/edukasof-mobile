@@ -2,7 +2,6 @@ import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { getGuestQuizCount } from '@/utils/guestLimit';
 import { deleteQuizzesProgress } from '@/utils/quizProgress';
-import { clearAllAuthStorage } from '@/utils/secureStorage';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
@@ -45,6 +44,7 @@ export default function HomeHeader({
 
     const removeCache = () => {
         deleteQuizzesProgress();
+        router.replace('/login');
     };
 
     return (
@@ -83,6 +83,7 @@ export default function HomeHeader({
             }}>
 
                 {/* Theme Toggle */}
+                {!isAuthenticated && (
                 <Pressable
                     onPress={handleToggle}
                     style={{
@@ -107,10 +108,11 @@ export default function HomeHeader({
                         {mode === 'light' ? '🌙 Mode sombre' : '☀️ Mode clair'}
                     </Text>
                 </Pressable>
+                )}
 
-                {/* clear cache to remove */}
+                {/* clear cache to remove 
                 <Pressable
-                    onPress={clearAllAuthStorage}
+                    onPress={removeCache}
                     style={{
                         marginTop: 16,
                         paddingVertical: 8,
@@ -133,6 +135,7 @@ export default function HomeHeader({
                         🧼 caches
                     </Text>
                 </Pressable>
+                */}
 
                 {!isAuthenticated && (
                     <Pressable

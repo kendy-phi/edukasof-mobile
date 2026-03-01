@@ -1,5 +1,6 @@
 import { useAuth } from "@/context/AuthContext";
-import React from "react";
+import { router } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
     Image,
     ScrollView,
@@ -10,7 +11,8 @@ import {
 } from "react-native";
 
 export default function ProfileScreen() {
-    const { user, logout } = useAuth();
+    const { user, logout, services } = useAuth();
+    const [quizStats, setQuizStats] = useState({ totalCompleted: 0, averageScore: 0, streak: 0, totalStudyMinutes: 0, bestScore: 0 });
 
     // Mock stats (plus tard ça viendra de ton API)
     const stats = {
@@ -18,6 +20,21 @@ export default function ProfileScreen() {
         averageScore: 82,
         bestScore: 95,
     };
+
+    const handleLogout = async () =>{
+        await logout();
+        router.replace('/home');
+
+    }
+
+    useEffect(() =>{
+        const loadStatistic = async () =>{
+            const quizStats = await services?.dashboard?.getQuizStats();//getQuizStats();
+            setQuizStats(quizStats);
+        }
+
+        loadStatistic();
+    },[])
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
@@ -42,17 +59,22 @@ export default function ProfileScreen() {
 
                 <View style={styles.statRow}>
                     <Text style={styles.statLabel}>Total Quiz</Text>
-                    <Text style={styles.statValue}>{stats.totalQuizzes}</Text>
+                    <Text style={styles.statValue}>{quizStats.totalCompleted}</Text>
                 </View>
 
                 <View style={styles.statRow}>
                     <Text style={styles.statLabel}>Moyenne</Text>
-                    <Text style={styles.statValue}>{stats.averageScore}%</Text>
+                    <Text style={styles.statValue}>{quizStats.averageScore}%</Text>
                 </View>
 
                 <View style={styles.statRow}>
                     <Text style={styles.statLabel}>Meilleur Score</Text>
-                    <Text style={styles.statValue}>{stats.bestScore}%</Text>
+                    <Text style={styles.statValue}>{quizStats.bestScore}%</Text>
+                </View>
+
+                <View style={styles.statRow}>
+                    <Text style={styles.statLabel}>Temps écoulés</Text>
+                    <Text style={styles.statValue}>{quizStats.totalStudyMinutes}min</Text>
                 </View>
             </View>
 
@@ -68,7 +90,7 @@ export default function ProfileScreen() {
 
                 <TouchableOpacity
                     style={[styles.button, styles.logoutButton]}
-                    onPress={logout}
+                    onPress={handleLogout}
                 >
                     <Text style={[styles.buttonText, styles.logoutText]}>
                         Se déconnecter
