@@ -5,7 +5,6 @@ import { getGuestQuizCount } from '@/utils/guestLimit';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
-import { nestApi } from '../../../api/nest';
 import { Quiz } from '../../../types/quiz';
 
 
@@ -14,7 +13,7 @@ export default function QuizDetailScreen() {
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [loading, setLoading] = useState(true);
   const [reached, setReached] = useState(0);
-  const {isAuthenticated} = useAuth();
+  const { isAuthenticated, services } = useAuth();
   const [showLimitModal, setShowLimitModal] = useState(false);
 
   useEffect(() => {
@@ -22,10 +21,12 @@ export default function QuizDetailScreen() {
 
     const loadQuiz = async () => {
       try {
-        const res = await nestApi.get<Quiz>(`/quiz/${id}`);
-        setQuiz(res.data);
+        const res = await services?.quiz?.description(id); //nestApi.get<Quiz>(`/quiz/${id}`);
+        console.log(res);
+        
+        setQuiz(res);
       } catch (error) {
-        console.error('Failed to load quiz', error);
+        console.log('Failed to load quiz', error);
       } finally {
         setLoading(false);
       }
@@ -34,8 +35,8 @@ export default function QuizDetailScreen() {
     loadQuiz();
   }, [id]);
 
-  useEffect(() =>{
-    const loadLimit = async () =>{
+  useEffect(() => {
+    const loadLimit = async () => {
       const limit = await getGuestQuizCount();
       setReached(limit);
     }
@@ -89,42 +90,50 @@ export default function QuizDetailScreen() {
           <Text>⏱️ Duration: {quiz.duration} minutes</Text>
           <Text>🎯 Passing score: {quiz.passingScore}%</Text>
           <Text>🏆 Total score: {quiz.totalScore}</Text>
-          <Text>{ !isAuthenticated ? `Number of reached ${reached}` : '' }</Text>
+          <Text>{!isAuthenticated ? `Number of reached ${reached}` : ''}</Text>
         </View>
         <LimitModal
           visible={showLimitModal}
-          onClose={() =>{ setShowLimitModal(false)}}
+          onClose={() => { setShowLimitModal(false) }}
         />
         {/* Start button */}
         <Pressable
           onPress={async () => {
-            
+
             if (!isAuthenticated) {
               const balance = await getGuestQuizCount();
               setReached(balance);
               if (reached >= 3) {
-                setShowLimitModal(true);
-                console.log("Guest reached the limit");
-                return;
-              }else{
-                console.log("Guest is free to play", reached);
-                
-              }
-            }else{
-              console.log("User is AUth", isAuthenticated);
-
-            }
+                  setShowLimitModal(true);
+                  console.log("Guest reached the limit");
+                  return;
+                } else {
+                  console.log("Guest is free to play", reached);
+                  // router.push(`/quiz/${quiz.id}/play`)
+                }
+            } 
             if (quiz.isPremium && !isAuthenticated) {
-              router.replace({
+              router.push({
                 pathname: '/login',
                 params: {
                   message: "Connectez-vous pour continuer, vous n'avez plus d'essaie quiz gratuits."
                 }
               });
             }
+            try {
+              const data = await services?.quiz?.startQuiz(id);
+              console.log('save apptempt response: ', data);
+              const params = { attemptId: data._id };
+              router.push({
+                pathname: `/quiz/${quiz.id}/play`,
+                params: params
+              });
+            } catch (e: any) {
+              console.log('error on Start quiz', e);
+
+            }
             // next step: start quiz session
-            console.log('Start quiz', quiz.id);
-            router.push(`/quiz/${quiz.id}/play`)
+            // 
 
           }}
           style={{

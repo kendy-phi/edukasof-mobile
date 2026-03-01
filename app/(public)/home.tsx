@@ -36,6 +36,7 @@ export default function HomeScreen() {
 	const [progressMap, setProgressMap] = useState<Record<string, any>>({});
 	const { isAuthenticated } = useAuth();
 	const { services } = useAuth();
+	const [totalQuiz, setTotalQuiz] = useState(0);
 
 
 
@@ -44,23 +45,33 @@ export default function HomeScreen() {
 	// 🔹 Fetch quizzes
 	const loadQuizzes = async (pageNumber = 1, append = false) => {
 		try {
-			const response = await services?.quiz.load(pageNumber, 10); //await getQuizzes();
+			const response = await services?.quiz.load(pageNumber, 10);
+			const newData = response.data;
+			const total = response.total;
 
 			if (append) {
-				setQuizzes(prev => [...prev, ...response.data]);
+				setQuizzes(prev => {
+					const updatedList = [...prev, ...newData];
+					// Mise à jour de hasMore basée sur la nouvelle longueur combinée
+					setHasMore(updatedList.length < total);
+					return updatedList;
+				});
 			} else {
-				setQuizzes(response.data);
+				setQuizzes(newData);
+				setTotalQuiz(total);
+				// Si on est à la page 1, on compare juste la première salve au total
+				setHasMore(newData.length < total);
+				setPage(1); // Reset la page si ce n'est pas un append (ex: refresh)
 			}
-			console.log("Data rows after loading: ", response.data.length);
 
-			setHasMore(response.data.length > 0);
 		} catch (error) {
-			console.log(error);
+			console.error(error);
 		} finally {
 			setLoading(false);
 			setLoadingMore(false);
 		}
 	};
+
 
 	// 🔹 Initial load
 	useEffect(() => {
@@ -175,7 +186,7 @@ export default function HomeScreen() {
 							quiz={quiz}
 							progressPercentage={progressPercentage}
 							onPress={() => {
-								if(quiz.isPremium && !isAuthenticated)
+								if (quiz.isPremium && !isAuthenticated)
 									router.push('/login');
 								router.push(`/quiz/${quiz.id}`)
 							}}

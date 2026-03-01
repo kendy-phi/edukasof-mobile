@@ -1,8 +1,3 @@
-import {
-  getQuizHistory,
-  getQuizStats,
-  getSchoolDashboard
-} from '@/api/dashboard';
 import { useAuth } from '@/context/AuthContext';
 import { useTenant } from '@/context/TenantContext';
 import { router } from 'expo-router';
@@ -28,7 +23,7 @@ const C = {
 
 export default function Dashboard() {
   const { tenant } = useTenant();
-  const { user } = useAuth();
+  const { user, services } = useAuth();
 
   const isFull = tenant?.type === "full";
 
@@ -47,13 +42,14 @@ export default function Dashboard() {
           setSchoolData(school);
         }
 
-        const stats = await getQuizStats();
+        const stats = await services?.dashboard?.getQuizStats();//getQuizStats();
         setQuizStats(stats);
         // console.log("Quiz statistic:", stats);
 
 
-        const history = await getQuizHistory();
-        setQuizHistory(history.slice(0, 3));
+        const history = await services?.dashboard?.getQuizHistory();console.log(history);
+         //getQuizHistory();
+        setQuizHistory(history);
 
       } catch (error: any) {
         console.log("Dashboard error:", error);

@@ -1,4 +1,4 @@
-import { getUserQuizInput } from '@/api/dashboard';
+import { useAuth } from '@/context/AuthContext';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
@@ -24,15 +24,18 @@ export default function QuizReview() {
     const { id, quizName } = useLocalSearchParams();
     const [data, setData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const {services} = useAuth();
 
 
     useEffect(() => {
         const loadReview = async () => {
             try {
-                const response = await getUserQuizInput(id.toString());
+                const response = await services?.dashboard?.getUserQuizInput(id.toString()); //getUserQuizInput(id.toString());
+                console.log(response);
+                
                 setData(response);
             } catch (error) {
-                console.log(error);
+                console.log("Quiz history ==> ",error);
             } finally {
                 setLoading(false);
             }

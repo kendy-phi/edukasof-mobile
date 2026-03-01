@@ -15,6 +15,8 @@ import {
     View,
 } from 'react-native';
 
+import { Answer } from '@/types/question';
+
 type Question = {
     _id: string;
     type: 'MCQ' | 'TRUE_FALSE' | 'SHORT_ANSWER' | 'MULTI_SELECT';
@@ -23,7 +25,7 @@ type Question = {
 };
 
 export default function PlayQuizScreen() {
-    const { id } = useLocalSearchParams<{ id: string }>();
+    const { id, attemptId } = useLocalSearchParams<{ id: string, attemptId: string }>();
     const router = useRouter();
     const { theme } = useTheme();
 
@@ -32,8 +34,8 @@ export default function PlayQuizScreen() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [selected, setSelected] = useState<string | null>(null);
     const [answers, setAnswers] = useState<Record<string, string[]>>({});
-    const { isAuthenticated } = useAuth();
-
+    const [bulkAnswers, setBulkAnswers] = useState<Answer[]>([]);
+    const { isAuthenticated, services } = useAuth();
 
 
     useEffect(() => {
@@ -109,6 +111,27 @@ export default function PlayQuizScreen() {
             [question._id]: [selected],
         };
 
+        const payload = {
+            attemptId,
+            questionId: question._id,
+            studentAnswer: [selected]
+        };
+
+        setBulkAnswers(prev => {
+            // 1. On cherche si la question est déjà dans le tableau
+            const index = prev.findIndex(item => item.questionId === payload.questionId);
+
+            if (index !== -1) {
+                // 2. Si elle existe, on crée une copie du tableau et on met à jour la réponse
+                const updated = [...prev];
+                updated[index] = payload;
+                return updated;
+            }
+
+            // 3. Sinon, on ajoute simplement le nouveau payload
+            return [...prev, payload];
+        });
+
         // 🔹 Save Progress
         await saveQuizProgress({
             quizId: id,
@@ -119,6 +142,14 @@ export default function PlayQuizScreen() {
         setAnswers(newAnswers);
 
         if (isLast) {
+            try {
+                const postAnswer = await services?.quiz?.storeAnswers(bulkAnswers);
+
+                // console.log("post answer response: ", postAnswer);
+            } catch (e: any) {
+                console.log(e);
+                return;
+            }
             // 🔹 Submit to backend
             console.log("Sending: ", answers, "at url: ", `/answers/validation/${id}`);
             let response: any;
@@ -136,17 +167,17 @@ export default function PlayQuizScreen() {
                     headers: error.response.headers
                 });
             } finally {
-                if(!isAuthenticated){
+                if (!isAuthenticated) {
                     await incrementGuestQuizCount();
                     console.log("Update Guest increment");
-                }else{
-                    console.log("Is auth");
-                    
                 }
+
                 if (response && response.data) {
                     let score = response.data.result.score, total = response.data.result.totalPoints, percentage = response.data.result.percentage, pathname = `/quiz/${id}/result`;
 
                     console.log(response.data, score, total, percentage);
+
+                    await services?.quiz?.finishedQuiz(attemptId, { score, totalQuestions:total });
 
                     router.replace({
                         pathname: pathname.toString(),
