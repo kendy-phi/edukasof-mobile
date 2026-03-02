@@ -3,7 +3,7 @@
     "name": "edukasof",
     "slug": "edukasof-mobile",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/splash.png",
     "scheme": "edukasofmobile",
     "userInterfaceStyle": "automatic",
