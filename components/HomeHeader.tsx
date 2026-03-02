@@ -139,7 +139,7 @@ export default function HomeHeader({
 
                 {!isAuthenticated && (
                     <Pressable
-                        onPress={() =>{ router.replace('/login') }}
+                        onPress={() =>{ router.push('/login') }}
                         style={{
                             marginTop: 16,
                             paddingVertical: 8,

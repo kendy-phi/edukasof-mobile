@@ -1,3 +1,4 @@
+import { useTheme } from '@/context/ThemeContext';
 import { useRouter } from 'expo-router';
 import { Modal, Pressable, Text, View } from 'react-native';
 
@@ -10,20 +11,20 @@ type Props = {
 
 export default function CustomModal({ visible, setVisible, modalTitle, bodyText }: Props) {
   const router = useRouter();
-  console.log("CustomModal rendered");
+  const { theme } = useTheme();
   return (
     <Modal transparent animationType="fade" visible={visible}>
       <View
         style={{
           flex: 1,
-          backgroundColor: 'rgba(0,0,0,0.5)',
+          backgroundColor: theme.background,
           justifyContent: 'center',
           padding: 24,
         }}
       >
         <View
           style={{
-            backgroundColor: 'white',
+            backgroundColor: theme.primary,
             padding: 20,
             borderRadius: 20,
           }}
@@ -33,25 +34,26 @@ export default function CustomModal({ visible, setVisible, modalTitle, bodyText 
               fontSize: 18,
               fontWeight: '700',
               marginBottom: 10,
+              color: theme.text
             }}
           >
             {modalTitle ?? ''}
           </Text>
 
-          <Text style={{ marginBottom: 20 }}>
+          <Text style={{ marginBottom: 20, color: theme.text }}>
             {bodyText ?? ''}
           </Text>
 
           <Pressable
             onPress={() => { setVisible(false)}}
             style={{
-              backgroundColor: '#2563eb',
+              backgroundColor: theme.background,
               padding: 12,
               borderRadius: 12,
               alignItems: 'center',
             }}
           >
-            <Text style={{ color: 'white', fontWeight: '600' }}>
+            <Text style={{ color: theme.text, fontWeight: '600' }}>
              OK
             </Text>
           </Pressable>
