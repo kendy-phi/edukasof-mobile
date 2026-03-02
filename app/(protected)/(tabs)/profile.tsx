@@ -1,4 +1,5 @@
 import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/context/ThemeContext";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -13,7 +14,7 @@ import {
 export default function ProfileScreen() {
     const { user, logout, services } = useAuth();
     const [quizStats, setQuizStats] = useState({ totalCompleted: 0, averageScore: 0, streak: 0, totalStudyMinutes: 0, bestScore: 0 });
-
+    const { theme } = useTheme();
     // Mock stats (plus tard ça viendra de ton API)
     const stats = {
         totalQuizzes: 12,
@@ -36,6 +37,7 @@ export default function ProfileScreen() {
         loadStatistic();
     },[])
 
+    const styles = _styles_(theme);
     return (
         <ScrollView contentContainerStyle={styles.container}>
             {/* Header */}
@@ -101,10 +103,11 @@ export default function ProfileScreen() {
     );
 }
 
-const styles = StyleSheet.create({
+const _styles_ = (C:any) =>
+StyleSheet.create({
     container: {
         padding: 20,
-        backgroundColor: "#f5f6fa",
+        backgroundColor: C.background,
     },
     header: {
         alignItems: "center",
@@ -119,13 +122,14 @@ const styles = StyleSheet.create({
     name: {
         fontSize: 20,
         fontWeight: "bold",
+        color: C.text
     },
     email: {
         fontSize: 14,
-        color: "#777",
+        color: C.text,
     },
     card: {
-        backgroundColor: "#fff",
+        backgroundColor: C.card,
         borderRadius: 12,
         padding: 15,
         marginBottom: 20,
@@ -143,17 +147,19 @@ const styles = StyleSheet.create({
     },
     statLabel: {
         fontSize: 14,
-        color: "#555",
+        color: C.text,
     },
     statValue: {
         fontSize: 14,
         fontWeight: "bold",
+        color: C.text
     },
     button: {
         paddingVertical: 12,
     },
     buttonText: {
         fontSize: 15,
+        color: C.text
     },
     logoutButton: {
         marginTop: 10,

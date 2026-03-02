@@ -1,17 +1,20 @@
+import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 
 export default function TabsLayout() {
+  const { theme } = useTheme();
   return (
     <Tabs
         backBehavior="history"
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#2563eb',
-        tabBarInactiveTintColor: '#6b7280',
+        tabBarActiveTintColor: theme.accent,
+        tabBarInactiveTintColor: theme.accentDark,
         tabBarStyle: {
           height: 100,
-          paddingBottom: 50
+          paddingBottom: 50,
+          backgroundColor: theme.background
         },
       }}
     >

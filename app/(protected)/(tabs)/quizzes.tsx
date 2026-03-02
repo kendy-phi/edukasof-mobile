@@ -134,7 +134,7 @@ export default function HomeScreen() {
 
   return (
       <ScrollView
-        style={{padding:5}}
+        style={{padding:5, backgroundColor: theme.card}}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl

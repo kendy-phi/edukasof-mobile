@@ -1,4 +1,6 @@
 import { useTenant } from '@/context/TenantContext';
+import { useTheme } from '@/context/ThemeContext';
+
 import { useRouter } from 'expo-router';
 import {
   Image,
@@ -8,19 +10,11 @@ import {
   View,
 } from 'react-native';
 
-const C = {
-  bg: '#ffffff',
-  surface: '#f8fafc',
-  border: '#e5e7eb',
-  text: '#111827',
-  muted: '#6b7280',
-  accent: '#2563eb',
-  accentDark: '#1e40af',
-};
 
 export default function EntryScreen() {
   const router = useRouter();
   const { setTenant } = useTenant();
+  const { theme } = useTheme();
 
   const handleSchool = async () => {
     await setTenant({
@@ -38,6 +32,8 @@ export default function EntryScreen() {
 
     router.replace('/home');
   };
+
+  const styles = _styles_(theme);
 
   return (
     <View style={styles.container}>
@@ -91,10 +87,11 @@ export default function EntryScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const _styles_ = (C: any) =>
+StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: C.bg,
+    backgroundColor: C.background,
     paddingHorizontal: 28,
     justifyContent: 'center',
   },

@@ -1,5 +1,6 @@
 import { useAuth } from '@/context/AuthContext';
 import { useTenant } from '@/context/TenantContext';
+import { useTheme } from '@/context/ThemeContext';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -24,6 +25,7 @@ const C = {
 export default function Dashboard() {
   const { tenant } = useTenant();
   const { user, services } = useAuth();
+  const { theme } = useTheme();
 
   const isFull = tenant?.type === "full";
 
@@ -48,7 +50,7 @@ export default function Dashboard() {
 
 
         const history = await services?.dashboard?.getQuizHistory();//console.log(history);
-         //getQuizHistory();
+        //getQuizHistory();
         setQuizHistory(history);
 
       } catch (error: any) {
@@ -68,7 +70,7 @@ export default function Dashboard() {
       </View>
     );
   }
-
+  const styles = _styles_(theme);
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ padding: 20 }}>
 
@@ -169,10 +171,11 @@ export default function Dashboard() {
   );
 }
 
-const styles = StyleSheet.create({
+const _styles_ = (C: any) =>
+StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: C.bg,
+    backgroundColor: C.background,
   },
   historyItem: {
     flexDirection: 'row',
