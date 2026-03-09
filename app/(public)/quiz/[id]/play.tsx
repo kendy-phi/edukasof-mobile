@@ -158,7 +158,9 @@ export default function PlayQuizScreen() {
                     answers: Object.keys(newAnswers).map(key => ({
                         key: key,
                         value: newAnswers[key]
-                    }))
+                    })),
+                    attemptId,
+                    bulkAnswers
                 });
             } catch (error: any) {
                 console.log('❌ Erreur serveur:', {

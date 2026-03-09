@@ -117,22 +117,22 @@ export default function Dashboard() {
 
           <View style={styles.rowBetween}>
             <Text style={styles.label}>Quiz complétés</Text>
-            <Text style={styles.value}>{quizStats.totalCompleted || 0}</Text>
+            <Text style={styles.value}>{quizStats?.totalCompleted || 0}</Text>
           </View>
 
           <View style={styles.rowBetween}>
             <Text style={styles.label}>Score moyen</Text>
-            <Text style={styles.value}>{quizStats.averageScore}%</Text>
+            <Text style={styles.value}>{quizStats?.averageScore}%</Text>
           </View>
 
           <View style={styles.rowBetween}>
             <Text style={styles.label}>Meilleur score</Text>
-            <Text style={styles.value}>{quizStats.bestScore}%</Text>
+            <Text style={styles.value}>{quizStats?.bestScore}%</Text>
           </View>
 
           <View style={styles.rowBetween}>
             <Text style={styles.label}>Temps passé</Text>
-            <Text style={styles.value}>{quizStats.totalStudyMinutes}min</Text>
+            <Text style={styles.value}>{quizStats?.totalStudyMinutes}min</Text>
           </View>
         </View>
       )}
@@ -146,15 +146,15 @@ export default function Dashboard() {
 
           <View key={index} style={styles.historyItem}>
             <View>
-              <Text style={styles.label}>{item.quizId.title}</Text>
+              <Text style={styles.label}>{item?.quizId?.title}</Text>
               <Text style={styles.value}>
-                {Math.round((item.score / item.totalQuestions) * 100)}%
+                {Math.round((item?.score / item?.totalQuestions) * 100)}%
               </Text>
             </View>
 
             <Pressable
               style={styles.reviewButton}
-              onPress={() => router.push(`/quiz-review/${item._id}`)}
+              onPress={() => router.push(`/quiz-review/${item?._id}`)}
             >
               <Text style={styles.reviewText}>Voir</Text>
             </Pressable>

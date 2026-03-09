@@ -9,7 +9,7 @@ export const quizApi = (api: AxiosInstance) => ({
 
     load: async (page = 1, limit = 10) => {
         const isPublished = true;
-        const response = await api.get('/quiz/search/filters', {
+        const response = await api.get('/quiz/search', {
             params: { page, limit, isPublished }
         });
         
@@ -32,19 +32,19 @@ export const quizApi = (api: AxiosInstance) => ({
     },
 
     startQuiz: async (quizId: string) => {
-        const response = await api.post(`/quiz-attempts/start`,{
+        const response = await api.post(`/quiz/play`,{
             quizId
         });
         return response.data;
     },
     
     finishedQuiz: async (id: string, data:{score:number, totalQuestions: number}) => {
-        const response = await api.patch(`/quiz-attempts/${id}/finish`, data);
+        const response = await api.patch(`/quiz/complete/${id}`, data);
         return response.data;    
     },
     
     completedQuiz: async () => {
-        const response = await api.post(`/quiz-attempts/my`);   
+        const response = await api.post(`/quiz/me`);   
         return response.data;     
     },
 

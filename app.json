@@ -17,7 +17,8 @@
         "foregroundImage": "./assets/images/splash.png",
         "backgroundImage": "./assets/images/splash.png",
         "monochromeImage": "./assets/images/splash.png"
-      }
+      },
+      "package": "com.kendy92.edukasofmobile"
     },
     "plugins": [
       "expo-router",
@@ -38,6 +39,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "be700751-dc8b-4686-8dc9-34e64b7d4271"
+      }
     }
   }
 }
