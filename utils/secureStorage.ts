@@ -21,6 +21,7 @@ export const getToken = async () => {
 
 export const removeToken = async () => {
   await SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY);
+  await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
 };
 
 export const getRefreshToken = async () => {

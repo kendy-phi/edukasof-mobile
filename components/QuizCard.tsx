@@ -17,6 +17,12 @@ const DIFFICULTY_COLORS: Record<string, [string, string]> = {
     Hard: ['#f97316', '#ea580c'],
 };
 
+const DIFFICULTY_TEXT: Record<string, string> = {
+    Low: "Débutant",
+    Medium: "Intermédiare",
+    Hard: "Avancé"
+}
+
 export function QuizCard({ quiz, onPress, progressPercentage }: Props) {
     const gradient = DIFFICULTY_COLORS[quiz.difficulty] ?? ['#38bdf8', '#0284c7'];
     // console.log("print quiz percentage: ", progressPercentage);
@@ -72,7 +78,7 @@ export function QuizCard({ quiz, onPress, progressPercentage }: Props) {
                                 letterSpacing: 0.8,
                             }}
                         >
-                            {quiz.difficulty}
+                            {DIFFICULTY_TEXT[quiz.difficulty]}
                         </Text>
                     </View>
 

@@ -19,7 +19,7 @@ export const dashboardApi = (api: AxiosInstance) => ({
 
     //`/answers/attempt/${attempId}`
     getUserQuizInput: async (attempId: string) => {
-        const response = await api.get(`/user/attempts/${attempId}`)//;console.log(response.data)
+        const response = await api.get(`/user/attempts/${attempId}`);//console.log(response)
         return response.data;
     }
 

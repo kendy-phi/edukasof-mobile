@@ -1,10 +1,12 @@
-
-import { nestApi } from '@/api/nest';
 import Screen from '@/components/Screen';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { incrementGuestQuizCount } from '@/utils/guestLimit';
-import { getQuizProgress, saveQuizProgress } from '@/utils/quizProgress';
+import {
+    clearQuizProgress,
+    getQuizProgress,
+    saveQuizProgress,
+} from '@/utils/quizProgress';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
@@ -25,9 +27,10 @@ type Question = {
 };
 
 export default function PlayQuizScreen() {
-    const { id, attemptId } = useLocalSearchParams<{ id: string, attemptId: string }>();
+    const { id, attemptId } = useLocalSearchParams<{ id: string; attemptId: string }>();
     const router = useRouter();
     const { theme } = useTheme();
+    const { isAuthenticated, services } = useAuth();
 
     const [questions, setQuestions] = useState<Question[]>([]);
     const [loading, setLoading] = useState(true);
@@ -35,33 +38,37 @@ export default function PlayQuizScreen() {
     const [selected, setSelected] = useState<string | null>(null);
     const [answers, setAnswers] = useState<Record<string, string[]>>({});
     const [bulkAnswers, setBulkAnswers] = useState<Answer[]>([]);
-    const { isAuthenticated, services } = useAuth();
+    const [submitting, setSubmitting] = useState(false);
 
+    /*
+    =========================
+    Load Quiz
+    =========================
+    */
 
     useEffect(() => {
-        if (!isAuthenticated) {
-            // check guest limit
-        }
-    }, []);
+        if (!id || !services?.quiz) return;
 
-
-    // 🔹 Load Questions
-    useEffect(() => {
         const loadQuiz = async () => {
             try {
-                const response = await nestApi.get(`/quiz/loadQuestion/${id}`);
-                const sorted = response.data.questions.sort(
-                    (a: any, b: any) => a.order - b.order
-                );
+                console.log(`Load quiz question: `,id);
+                const quiz = await services.quiz.loadQuizWithQuestion(id);
 
-                if (response.data.isPremium && !isAuthenticated) {
+                if (!quiz) return;
+
+                if (quiz.isPremium && !isAuthenticated) {
                     router.replace({
                         pathname: '/login',
                         params: {
-                            message: "🔒 Ce quiz est premium. Connectez-vous pour continuer."
-                        }
+                            message: '🔒 Ce quiz est premium. Connectez-vous pour continuer.',
+                        },
                     });
+                    return;
                 }
+
+                const sorted = quiz.questions.sort(
+                    (a: any, b: any) => a.order - b.order
+                );
 
                 setQuestions(sorted);
             } catch (error) {
@@ -71,22 +78,127 @@ export default function PlayQuizScreen() {
             }
         };
 
-        if (id) loadQuiz();
-    }, [id]);
+        loadQuiz();
+    }, [id, services, isAuthenticated]);
 
-    // 🔹 Recover Progress
+    /*
+    =========================
+    Recover Progress
+    =========================
+    */
+
     useEffect(() => {
+        if (!id || questions.length === 0) return;
+
         const recover = async () => {
             const progress = await getQuizProgress(id);
+            console.log(`Recover quiz answers: `,progress);
 
-            if (progress && progress.quizId === id) {
-                setCurrentIndex(progress.currentIndex);
-                setAnswers(progress.answers);
+            if (!progress || progress.quizId !== id) return;
+
+            // 🔥 Quiz déjà terminé mais pas encore soumis
+            if (progress.currentIndex >= questions.length) {
+                console.log("Quiz completed previously, submitting...");
+                submitAnswers(progress.answers);
+                return;
+            }
+
+            setCurrentIndex(progress.currentIndex);
+            setAnswers(progress.answers);
+
+            const q = questions[progress.currentIndex];
+
+            if (q && progress.answers[q._id]) {
+                setSelected(progress.answers[q._id][0]);
             }
         };
 
         recover();
-    }, [id]);
+    }, [id, questions]);
+
+    /*
+    =========================
+    Submit answers
+    =========================
+    */
+
+    const submitAnswers = async (finalAnswers: Record<string, string[]>) => {
+        if (!services?.quiz || submitting) return;
+        console.log(`Submit quiz answers: `,finalAnswers);
+        setSubmitting(true)
+        try {
+            const payload = {
+                attemptId,
+                answers: Object.keys(finalAnswers).map((key) => ({
+                    key,
+                    value: finalAnswers[key],
+                })),
+            };
+
+            const data = await services.quiz.validate(payload, id, isAuthenticated);
+            console.log(`Quiz validate response: `,data);
+            
+            if (!isAuthenticated) {
+                await incrementGuestQuizCount();
+            }
+
+            if (data) {
+                router.replace({
+                    pathname: `/quiz/${id}/result`,
+                    params: {
+                        score: data.score.toString(),
+                        total: data.totalPoints.toString(),
+                        percentage: data.percentage.toFixed(0),
+                    },
+                });
+            }
+
+            await clearQuizProgress(id);
+        } catch (error: any) {
+            console.log('❌ Server error:', error?.response?.data || error);
+        }
+    };
+
+    /*
+    =========================
+    Next Question
+    =========================
+    */
+
+    const handleNext = async () => {
+        if (!selected) return;
+
+        const question = questions[currentIndex];
+        const isLast = currentIndex === questions.length - 1;
+
+        const newAnswers = {
+            ...answers,
+            [question._id]: [selected],
+        };
+
+        setAnswers(newAnswers);
+
+        await saveQuizProgress({
+            quizId: id,
+            currentIndex: currentIndex + 1,
+            answers: newAnswers,
+        });
+
+        if (isLast) {
+            submitAnswers(newAnswers);
+            clearQuizProgress(id);
+            return;
+        }
+
+        setCurrentIndex((prev) => prev + 1);
+        setSelected(null);
+    };
+
+    /*
+    =========================
+    Loading
+    =========================
+    */
 
     if (loading) {
         return (
@@ -97,112 +209,19 @@ export default function PlayQuizScreen() {
     }
 
     const question = questions[currentIndex];
-    if (!question) return null;
+    if (!question) return ;
 
     const isLast = currentIndex === questions.length - 1;
 
-    const handleNext = async () => {
-        if (!selected) return;
-
-        const nextIndex = currentIndex + 1;
-
-        const newAnswers = {
-            ...answers,
-            [question._id]: [selected],
-        };
-
-        const payload = {
-            attemptId,
-            questionId: question._id,
-            studentAnswer: [selected]
-        };
-
-        setBulkAnswers(prev => {
-            // 1. On cherche si la question est déjà dans le tableau
-            const index = prev.findIndex(item => item.questionId === payload.questionId);
-
-            if (index !== -1) {
-                // 2. Si elle existe, on crée une copie du tableau et on met à jour la réponse
-                const updated = [...prev];
-                updated[index] = payload;
-                return updated;
-            }
-
-            // 3. Sinon, on ajoute simplement le nouveau payload
-            return [...prev, payload];
-        });
-
-        // 🔹 Save Progress
-        await saveQuizProgress({
-            quizId: id,
-            currentIndex: nextIndex,
-            answers: newAnswers,
-        });
-
-        setAnswers(newAnswers);
-
-        if (isLast) {
-            try {
-                const postAnswer = await services?.quiz?.storeAnswers(bulkAnswers);
-
-                // console.log("post answer response: ", postAnswer);
-            } catch (e: any) {
-                console.log(e);
-                return;
-            }
-            // 🔹 Submit to backend
-            console.log("Sending: ", answers, "at url: ", `/answers/validation/${id}`);
-            let response: any;
-            try {
-                response = await nestApi.post(`/answers/validation/${id}`, {
-                    answers: Object.keys(newAnswers).map(key => ({
-                        key: key,
-                        value: newAnswers[key]
-                    })),
-                    attemptId,
-                    bulkAnswers
-                });
-            } catch (error: any) {
-                console.log('❌ Erreur serveur:', {
-                    status: error.response.status,
-                    data: error.response.data,
-                    headers: error.response.headers
-                });
-            } finally {
-                if (!isAuthenticated) {
-                    await incrementGuestQuizCount();
-                    console.log("Update Guest increment");
-                }
-
-                if (response && response.data) {
-                    let score = response.data.result.score, total = response.data.result.totalPoints, percentage = response.data.result.percentage, pathname = `/quiz/${id}/result`;
-
-                    console.log(response.data, score, total, percentage);
-
-                    await services?.quiz?.finishedQuiz(attemptId, { score, totalQuestions:total });
-
-                    router.replace({
-                        pathname: pathname.toString(),
-                        params: {
-                            score: score.toString(),
-                            total: total.toString(),
-                            percentage: percentage.toFixed(0)
-                        }
-                    });
-                }
-            }
-
-            // await clearQuizProgress(id);
-        } else {
-            setCurrentIndex(nextIndex);
-            setSelected(null);
-        }
-    };
+    /*
+    =========================
+    UI
+    =========================
+    */
 
     return (
         <Screen>
             <View style={{ flex: 1, padding: 20 }}>
-                {/* Question */}
                 <Text
                     style={{
                         fontSize: 20,
@@ -216,7 +235,7 @@ export default function PlayQuizScreen() {
 
                 {/* MCQ */}
                 {question.type === 'MCQ' &&
-                    question.options?.map((option) => (
+                    question?.options?.map((option) => (
                         <Pressable
                             key={option}
                             onPress={() => setSelected(option)}
@@ -230,8 +249,7 @@ export default function PlayQuizScreen() {
                         >
                             <Text
                                 style={{
-                                    color:
-                                        selected === option ? 'white' : theme.text,
+                                    color: selected === option ? 'white' : theme.text,
                                 }}
                             >
                                 {option}
@@ -239,7 +257,7 @@ export default function PlayQuizScreen() {
                         </Pressable>
                     ))}
 
-                {/* TRUE_FALSE */}
+                {/* TRUE/FALSE */}
                 {question.type === 'TRUE_FALSE' &&
                     ['True', 'False'].map((option) => (
                         <Pressable
@@ -255,11 +273,10 @@ export default function PlayQuizScreen() {
                         >
                             <Text
                                 style={{
-                                    color:
-                                        selected === option ? 'white' : theme.text,
+                                    color: selected === option ? 'white' : theme.text,
                                 }}
                             >
-                                {option == 'True' ? 'VRAI' : 'FAUX'}
+                                {option === 'True' ? 'VRAI' : 'FAUX'}
                             </Text>
                         </Pressable>
                     ))}
@@ -270,12 +287,13 @@ export default function PlayQuizScreen() {
                         value={selected ?? ''}
                         onChangeText={setSelected}
                         placeholder="Votre réponse..."
+                        placeholderTextColor={theme.text}
                         style={{
                             borderWidth: 1,
                             borderColor: theme.border,
                             borderRadius: 12,
                             padding: 14,
-                            color: theme.text,
+                            color: theme.text
                         }}
                     />
                 )}
@@ -286,16 +304,14 @@ export default function PlayQuizScreen() {
                     onPress={handleNext}
                     style={{
                         marginTop: 'auto',
-                        backgroundColor: selected
-                            ? theme.primary
-                            : '#94a3b8',
+                        backgroundColor: selected ? theme.primary : '#94a3b8',
                         paddingVertical: 16,
                         borderRadius: 14,
                         alignItems: 'center',
                     }}
                 >
                     <Text style={{ color: 'white', fontSize: 18 }}>
-                        {isLast ? 'Finish' : 'Next'}
+                        {isLast ? 'Terminer' : 'Suivant'}
                     </Text>
                 </Pressable>
             </View>

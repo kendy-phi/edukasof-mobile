@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const KEY = 'GUEST_QUIZ_COUNT';
+const KEY = 'EDUKASOF_GUEST_QUIZ_COUNT';
 const LIMIT = 3;
 
 export const getGuestQuizCount = async () => {

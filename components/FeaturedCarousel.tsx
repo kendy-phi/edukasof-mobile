@@ -14,6 +14,12 @@ const DIFFICULTY_COLORS: Record<string, [string, string]> = {
     Hard: ['#f97316', '#ea580c'],
 };
 
+const DIFFICULTY_TEXT: Record<string, string> = {
+    Low: "Débutant",
+    Medium: "Intermédiare",
+    Hard: "Avancé"
+}
+
 export default function FeaturedCarousel({ quizzes }: Props) {
     const { theme, mode } = useTheme();
     const router = useRouter();
@@ -78,7 +84,7 @@ export default function FeaturedCarousel({ quizzes }: Props) {
                                             textTransform: 'uppercase',
                                         }}
                                     >
-                                        {quiz.difficulty}
+                                        {DIFFICULTY_TEXT[quiz.difficulty]}
                                     </Text>
                                 </View>
                             </View>

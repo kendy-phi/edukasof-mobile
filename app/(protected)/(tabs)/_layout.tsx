@@ -9,8 +9,8 @@ export default function TabsLayout() {
         backBehavior="history"
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: theme.accent,
-        tabBarInactiveTintColor: theme.accentDark,
+        tabBarActiveTintColor: theme.primary,
+        tabBarInactiveTintColor: theme.text,
         tabBarStyle: {
           height: 100,
           paddingBottom: 50,

@@ -34,8 +34,7 @@ export default function HomeScreen() {
 	const [loadingMore, setLoadingMore] = useState(false);
 	const [continueQuiz, setContinueQuiz] = useState<any>(null);
 	const [progressMap, setProgressMap] = useState<Record<string, any>>({});
-	const { isAuthenticated } = useAuth();
-	const { services } = useAuth();
+	const { isAuthenticated, services } = useAuth();
 	const [totalQuiz, setTotalQuiz] = useState(0);
 
 

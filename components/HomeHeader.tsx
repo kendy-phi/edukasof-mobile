@@ -1,7 +1,7 @@
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { getGuestQuizCount } from '@/utils/guestLimit';
-import { deleteQuizzesProgress } from '@/utils/quizProgress';
+import { clearAllAuthStorage } from '@/utils/secureStorage';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
@@ -18,7 +18,7 @@ export default function HomeHeader({
     onToggleTheme,
 }: Props) {
     const { theme, mode, toggleTheme } = useTheme();
-    const { isAuthenticated, user } = useAuth();
+    const { isAuthenticated, user, services } = useAuth();
     const [remainging, setRemaining] = useState(0);
 
     useEffect(() => {
@@ -43,7 +43,8 @@ export default function HomeHeader({
     };
 
     const removeCache = () => {
-        deleteQuizzesProgress();
+        // deleteQuizzesProgress();
+        clearAllAuthStorage();
         router.replace('/login');
     };
 

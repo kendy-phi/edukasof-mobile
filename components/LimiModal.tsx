@@ -1,5 +1,6 @@
 import { useRouter } from 'expo-router';
 import { Modal, Pressable, Text, View } from 'react-native';
+import { useTheme } from '@/context/ThemeContext';
 
 type Props = {
   visible: boolean;
@@ -8,6 +9,7 @@ type Props = {
 
 export default function LimitModal({ visible, onClose }: Props) {
   const router = useRouter();
+  const theme = useTheme();
 
   return (
     <Modal transparent animationType="fade" visible={visible}>

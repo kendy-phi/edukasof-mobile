@@ -1,10 +1,15 @@
+import Screen from '@/components/Screen';
+import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
-
 export default function QuizResultScreen() {
   const { score, total, percentage } = useLocalSearchParams();
+  const { isAuthenticated } = useAuth();
+  const { theme } = useTheme();
 
   return (
+    <Screen>
     <View
       style={{
         flex: 1,
@@ -13,11 +18,11 @@ export default function QuizResultScreen() {
         padding: 24,
       }}
     >
-      <Text style={{ fontSize: 28, fontWeight: '800' }}>
+      <Text style={{ fontSize: 28, fontWeight: '800', color:theme.text }}>
         Résultat
       </Text>
 
-      <Text style={{ fontSize: 22, marginTop: 20 }}>
+      <Text style={{ fontSize: 22, marginTop: 20, color:theme.text }}>
         {score} / {total}
       </Text>
 
@@ -32,7 +37,7 @@ export default function QuizResultScreen() {
       </Text>
 
       <Pressable
-        onPress={() => router.replace('/home')}
+        onPress={() => isAuthenticated ? router.replace('/(protected)/(tabs)/quizzes') : router.replace('/home')}
         style={{
           marginTop: 40,
           backgroundColor: '#2563eb',
@@ -46,5 +51,6 @@ export default function QuizResultScreen() {
         </Text>
       </Pressable>
     </View>
+    </Screen>
   );
 }

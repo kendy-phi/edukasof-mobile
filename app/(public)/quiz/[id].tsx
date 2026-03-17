@@ -1,10 +1,11 @@
 import LimitModal from '@/components/LimiModal';
 import Screen from '@/components/Screen';
 import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
 import { getGuestQuizCount } from '@/utils/guestLimit';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Quiz } from '../../../types/quiz';
 
 
@@ -15,6 +16,8 @@ export default function QuizDetailScreen() {
   const [reached, setReached] = useState(0);
   const { isAuthenticated, services } = useAuth();
   const [showLimitModal, setShowLimitModal] = useState(false);
+  const { theme } = useTheme();
+  const styles = _styles_(theme);
 
   useEffect(() => {
     if (!id) return;
@@ -45,7 +48,7 @@ export default function QuizDetailScreen() {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center' }}>
+      <View style={styles.loader}>
         <ActivityIndicator size="large" />
       </View>
     );
@@ -53,7 +56,7 @@ export default function QuizDetailScreen() {
 
   if (!quiz) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={styles.blankContainer}>
         <Text>Quiz not found</Text>
       </View>
     );
@@ -61,31 +64,25 @@ export default function QuizDetailScreen() {
 
   return (
     <Screen>
-      <View style={{ flex: 1, padding: 20 }}>
+      <View style={styles.container}>
         {/* Title */}
-        <Text style={{ fontSize: 26, fontWeight: '800', marginBottom: 8 }}>
+        <Text style={styles.quizTitle}>
           {quiz.title}
         </Text>
 
         {/* Meta */}
-        <Text style={{ color: '#64748b', marginBottom: 12 }}>
+        <Text style={styles.quizCategory}>
           {quiz.category} • {quiz.difficulty} • Grade {quiz.grade}
         </Text>
 
         {/* Description */}
-        <Text style={{ fontSize: 16, lineHeight: 22, marginBottom: 20 }}>
+        <Text style={styles.quizDescription}>
           {quiz.description}
         </Text>
 
         {/* Stats */}
         <View
-          style={{
-            backgroundColor: '#f8fafc',
-            borderRadius: 12,
-            padding: 16,
-            marginBottom: 24,
-            gap: 8,
-          }}
+          style={styles.cardBody}
         >
           <Text>⏱️ Duration: {quiz.duration} minutes</Text>
           <Text>🎯 Passing score: {quiz.passingScore}%</Text>
@@ -112,10 +109,9 @@ export default function QuizDetailScreen() {
                   // router.push(`/quiz/${quiz.id}/play`)
                 }
             } 
-            if (quiz.isPremium && !isAuthenticated) {
+            if (quiz.isPremium && !isAuthenticated && reached >= 3) {
               router.push({
-                pathname: '/login',
-                params: {
+                pathname: '/login',    params: {
                   message: "Connectez-vous pour continuer, vous n'avez plus d'essaie quiz gratuits."
                 }
               });
@@ -136,19 +132,10 @@ export default function QuizDetailScreen() {
             // 
 
           }}
-          style={{
-            backgroundColor: '#2563eb',
-            paddingVertical: 16,
-            borderRadius: 14,
-            alignItems: 'center',
-          }}
+          style={styles.btnContainer}
         >
           <Text
-            style={{
-              color: 'white',
-              fontSize: 18,
-              fontWeight: '700',
-            }}
+            style={styles.btnStartQuiz}
           >
             Start Quiz
           </Text>
@@ -157,3 +144,17 @@ export default function QuizDetailScreen() {
     </Screen>
   );
 }
+
+const _styles_ = (C: any) =>
+  StyleSheet.create({
+    loader:{ flex: 1, justifyContent: 'center' },
+    blankContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+    container: { flex: 1, padding: 20 },
+    quizTitle: { fontSize: 26, fontWeight: '800', marginBottom: 8, color: C.text },
+    quizCategory: { color: '#64748b', marginBottom: 12 },
+    quizDescription: { fontSize: 16, lineHeight: 22, marginBottom: 20, color: C.text },
+    cardBody: { backgroundColor: '#f8fafc', borderRadius: 12, padding: 16, marginBottom: 24, gap: 8 },
+    btnContainer: { backgroundColor: '#2563eb',paddingVertical: 16,borderRadius: 14,alignItems: 'center' },
+    btnStartQuiz: { color: C.text, fontSize: 18, fontWeight: '700'}
+    
+  });

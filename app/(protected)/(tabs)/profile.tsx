@@ -1,3 +1,4 @@
+import CustomModal from "@/components/ModalUI";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { router } from "expo-router";
@@ -14,7 +15,8 @@ import {
 export default function ProfileScreen() {
     const { user, logout, services } = useAuth();
     const [quizStats, setQuizStats] = useState({ totalCompleted: 0, averageScore: 0, streak: 0, totalStudyMinutes: 0, bestScore: 0 });
-    const { theme } = useTheme();
+    const { theme, mode, toggleTheme } = useTheme();
+    const [ profilVisible, setProfilVisible] = useState(false)
     // Mock stats (plus tard ça viendra de ton API)
     const stats = {
         totalQuizzes: 12,
@@ -28,6 +30,16 @@ export default function ProfileScreen() {
 
     }
 
+    const handleToggleTheme = () =>{
+        if(!toggleTheme) return;
+        
+        toggleTheme();
+    }
+
+    const handleModal = () =>{
+
+    }
+
     useEffect(() =>{
         const loadStatistic = async () =>{
             const quizStats = await services?.dashboard?.getQuizStats();//getQuizStats();
@@ -36,6 +48,8 @@ export default function ProfileScreen() {
 
         loadStatistic();
     },[])
+
+
 
     const styles = _styles_(theme);
     return (
@@ -82,12 +96,18 @@ export default function ProfileScreen() {
 
             {/* Actions Section */}
             <View style={styles.card}>
+                <TouchableOpacity 
+                    style={styles.button}
+                    onPress={handleToggleTheme}
+                >
+                    <Text style={styles.buttonText}>{mode === 'light' ? '🌙 Mode sombre' : '☀️ Mode clair'}</Text>
+                </TouchableOpacity>
                 <TouchableOpacity style={styles.button}>
-                    <Text style={styles.buttonText}>Modifier Profil</Text>
+                    <Text style={styles.buttonText}>👤 Modifier Profil</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.button}>
-                    <Text style={styles.buttonText}>Changer mot de passe</Text>
+                    <Text style={styles.buttonText}>🔑 Changer mot de passe</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -95,10 +115,11 @@ export default function ProfileScreen() {
                     onPress={handleLogout}
                 >
                     <Text style={[styles.buttonText, styles.logoutText]}>
-                        Se déconnecter
+                        ❌ Se déconnecter
                     </Text>
                 </TouchableOpacity>
             </View>
+            <CustomModal visible={profilVisible} setVisible={setProfilVisible} modalTitle={"Modifier le profile"} bodyText={"Exemple de text"}></CustomModal>
         </ScrollView>
     );
 }
@@ -139,6 +160,7 @@ StyleSheet.create({
         fontSize: 16,
         fontWeight: "bold",
         marginBottom: 15,
+        color: C.text
     },
     statRow: {
         flexDirection: "row",

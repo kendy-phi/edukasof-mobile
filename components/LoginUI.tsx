@@ -234,7 +234,7 @@ export default function LoginScreen({
                     <>
                         <View style={styles.divider}>
                             <View style={styles.dividerLine} />
-                            <Text style={styles.dividerText}>Vous n'avez pas de compte?</Text>
+                            <Text style={styles.dividerText}>{ showName ? 'Connectez vous maintenant!' : "Vous n'avez pas de compte?"}</Text>
                             <View style={styles.dividerLine} />
                         </View>
 
@@ -281,7 +281,7 @@ const _styles_ = (C: any) =>
             shadowRadius: 16,
             elevation: 8,
         },
-        logoText: { fontSize: 22, color: C.text },
+        logoText: { fontSize: 22, color: C.logoText },
 
         heading: {
             fontSize: 30,
@@ -352,7 +352,7 @@ const _styles_ = (C: any) =>
         btnLoginText: {
             fontSize: 15,
             fontWeight: '600',
-            color: C.text,
+            color: C.buttonText,
             letterSpacing: 0.2,
         },
 
@@ -378,5 +378,5 @@ const _styles_ = (C: any) =>
             borderColor: C.accent,
             backgroundColor: C.accentGlow,
         },
-        btnRegisterText: { fontSize: 14, fontWeight: '500', color: C.text },
+        btnRegisterText: { fontSize: 14, fontWeight: '500', color: C.secondaryText },
     });

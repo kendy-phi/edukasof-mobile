@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { resetGuestQuizCount } from './guestLimit';
 
-const KEY = 'QUIZ_PROGRESS';
+const KEY = 'EDUKASOF_QUIZ_PROGRESS';
 
 type QuizProgress = {
   quizId: string;

@@ -31,7 +31,7 @@ export default function QuizReview() {
         const loadReview = async () => {
             try {
                 const response = await services?.dashboard?.getUserQuizInput(id.toString()); //getUserQuizInput(id.toString());
-                console.log(response);
+                //console.log(`response from quiz history`,response, id, quizName);
                 
                 setData(response);
             } catch (error) {
@@ -56,12 +56,15 @@ export default function QuizReview() {
         <ScrollView style={styles.container}>
             <Text style={styles.title}>Révision des questions: {quizName}</Text>
 
-            {data.map((item, index) => (
+            {data.map((item, index) => {
+                console.log("user entry ==> ", item);
+                
+                return (
 
                     <View key={index} style={item.isCorrect ? styles.card_success : styles.card_failed}>
                         <View style={styles.questionHeader}>
                             <Text style={styles.questionText}>
-                                {index + 1}. {item.questionId.questionText}
+                                {index + 1}. {item?.question?.questionText}
                             </Text>
 
                             <View
@@ -82,20 +85,20 @@ export default function QuizReview() {
 
                         {!item.isCorrect && (
                             <Text style={styles.correctAnswer}>
-                                Reponse correcte: {item.questionId.correctAnswer}
+                                Reponse correcte: {item?.question?.correctAnswer}
                             </Text>
                         )}
                     </View>
-                )
+                )}
             )}
             <View style={styles.actions}>
                 <Pressable style={styles.primaryButton} onPress={() =>{ router.replace('/dashboard')}}>
                     <Text style={styles.primaryText}> Tableau de bord</Text>
                 </Pressable>
 
-                <Pressable style={styles.secondaryButton} onPress={() =>{ router.replace('/(protected)/(tabs)/quizzes')}}>
+                {/* <Pressable style={styles.secondaryButton} onPress={() =>{ router.replace('/(protected)/(tabs)/quizzes')}}>
                     <Text style={styles.secondaryText}> Lister Quiz</Text>
-                </Pressable>
+                </Pressable> */}
             </View>
         </ScrollView>
     );

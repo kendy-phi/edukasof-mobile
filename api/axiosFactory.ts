@@ -18,6 +18,7 @@ export const createApiClient = (tenantUrl: string) => {
 
     let isRefreshing = false;
     let failedQueue: any[] = [];
+    let redirectToLogin = true;
 
     const processQueue = (error: any, token: string | null = null) => {
         failedQueue.forEach((prom) => {
@@ -66,12 +67,19 @@ export const createApiClient = (tenantUrl: string) => {
                 }
 
                 isRefreshing = true;
+                redirectToLogin = true;
 
                 try {
                     const refreshToken = await getRefreshToken();
 
                     if (!refreshToken) {
+                        console.log(`No refresh token found`);
+                        
+                        // router.push('/login');
                         throw new Error('No refresh token');
+                    }else{
+                        console.log(`Refresh token found: `, refreshToken);
+                        
                     }
 
                     const response = await axios.post(
@@ -87,19 +95,18 @@ export const createApiClient = (tenantUrl: string) => {
 
                     originalRequest.headers.Authorization = `Bearer ${accessToken}`;
 
+                    redirectToLogin = false;
+
                     return api(originalRequest);
 
                 } catch (refreshError) {
                     processQueue(refreshError, null);
                     await clearAllAuthStorage();
-                    Alert.alert(
-                        "Session expirée",
-                        "Veuillez vous reconnecter pour continuer.",
-                        [{ text: "OK", onPress: () => { router.push('/login') } }]
-                    );
                     return Promise.reject(refreshError);
                 } finally {
                     isRefreshing = false;
+                    if(redirectToLogin)
+                        router.push('/login');
                 }
             } else if (error?.response?.status === 402) {
                 Alert.alert("Access!", "Vous n'avez pas accès avec la resource demander.");
@@ -107,7 +114,7 @@ export const createApiClient = (tenantUrl: string) => {
                 // Cas 2 : Erreur serveur générique (500)
                 Alert.alert("Erreur Serveur", "Un problème est survenu sur nos serveurs.");
                 console.log("Error status: ", error?.response?.status)
-            } else {
+            } else if(error?.response?.status != 422) {
                 // Cas 3 : Problème de connexion (Pas de réponse du serveur)
                 const rawMessage = error?.response?.data?.message;
 
