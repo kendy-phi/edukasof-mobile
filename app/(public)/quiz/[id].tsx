@@ -155,6 +155,6 @@ const _styles_ = (C: any) =>
     quizDescription: { fontSize: 16, lineHeight: 22, marginBottom: 20, color: C.text },
     cardBody: { backgroundColor: '#f8fafc', borderRadius: 12, padding: 16, marginBottom: 24, gap: 8 },
     btnContainer: { backgroundColor: '#2563eb',paddingVertical: 16,borderRadius: 14,alignItems: 'center' },
-    btnStartQuiz: { color: C.text, fontSize: 18, fontWeight: '700'}
+    btnStartQuiz: { color: C.buttonText, fontSize: 18, fontWeight: '700'}
     
   });
