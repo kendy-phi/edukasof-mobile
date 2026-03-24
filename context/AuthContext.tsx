@@ -39,10 +39,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // 🔥 Determine correct backend per school
     const baseURL = useMemo(() => {
-        if (tenant?.type === "full" && tenant.baseURL) {
-            return tenant.baseURL;
-        }
-        return ENV.NEST_API;
+        return tenant?.baseURL || "http://192.168.192.8:9000/api/v1";
     }, [tenant]);
 
     // 🔥 Create tenant-aware services

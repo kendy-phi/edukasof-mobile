@@ -28,7 +28,7 @@ export default function EntryScreen() {
     await setTenant({
       type: "independent",
       name: "EdukasoF Quiz",
-      baseURL: "127.0.0.1:9000"
+      baseURL: "127.0.0.1:9000/api/app"
     });
 
     router.replace('/home');

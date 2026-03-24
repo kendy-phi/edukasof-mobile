@@ -8,7 +8,8 @@ export const dashboardApi = (api: AxiosInstance) => ({
         return response.data;
     },
     getQuizStats: async () => {
-        const response = await api.get('/user/statistic/my');//console.log(response.data);  
+        console.log(api)      
+        const response = await api.get('/user/statistic/me');//console.log(response.data);  
         return response.data.data;
     },
 
