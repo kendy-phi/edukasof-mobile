@@ -39,7 +39,7 @@ export const TenantProvider = ({ children }: { children: React.ReactNode }) => {
         setTenantState({
           type: type as InstitutionType,
           name,
-          baseURL: baseURL || "http://192.168.192.8:9000/api/v1",
+          baseURL: baseURL || undefined
         });
       }
 

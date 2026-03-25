@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // 🔥 Determine correct backend per school
     const baseURL = useMemo(() => {
-        return tenant?.baseURL || "http://192.168.192.8:9000/api/v1";
+        return tenant?.baseURL || ENV.LARAVEL_API
     }, [tenant]);
 
     // 🔥 Create tenant-aware services

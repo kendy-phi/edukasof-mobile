@@ -39,6 +39,15 @@ export default function PlayQuizScreen() {
     const [answers, setAnswers] = useState<Record<string, string[]>>({});
     const [bulkAnswers, setBulkAnswers] = useState<Answer[]>([]);
     const [submitting, setSubmitting] = useState(false);
+    const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+
+    const toggleOption = (option: string) => {
+        if (selectedOptions.includes(option)) {
+            setSelectedOptions(selectedOptions.filter(o => o !== option));
+        } else {
+            setSelectedOptions([...selectedOptions, option]);
+        }
+    };
 
     /*
     =========================
@@ -51,7 +60,7 @@ export default function PlayQuizScreen() {
 
         const loadQuiz = async () => {
             try {
-                console.log(`Load quiz question: `,id);
+                console.log(`Load quiz question: `, id);
                 const quiz = await services.quiz.loadQuizWithQuestion(id);
 
                 if (!quiz) return;
@@ -92,7 +101,7 @@ export default function PlayQuizScreen() {
 
         const recover = async () => {
             const progress = await getQuizProgress(id);
-            console.log(`Recover quiz answers: `,progress);
+            console.log(`Recover quiz answers: `, progress);
 
             if (!progress || progress.quizId !== id) return;
 
@@ -124,7 +133,7 @@ export default function PlayQuizScreen() {
 
     const submitAnswers = async (finalAnswers: Record<string, string[]>) => {
         if (!services?.quiz || submitting) return;
-        console.log(`Submit quiz answers: `,finalAnswers);
+        console.log(`Submit quiz answers: `, finalAnswers);
         setSubmitting(true)
         try {
             const payload = {
@@ -136,8 +145,8 @@ export default function PlayQuizScreen() {
             };
 
             const data = await services.quiz.validate(payload, id, isAuthenticated);
-            console.log(`Quiz validate response: `,data);
-            
+            console.log(`Quiz validate response: `, data);
+
             if (!isAuthenticated) {
                 await incrementGuestQuizCount();
             }
@@ -209,7 +218,7 @@ export default function PlayQuizScreen() {
     }
 
     const question = questions[currentIndex];
-    if (!question) return ;
+    if (!question) return;
 
     const isLast = currentIndex === questions.length - 1;
 
@@ -218,7 +227,7 @@ export default function PlayQuizScreen() {
     UI
     =========================
     */
-
+    console.log(`Question: `, question)
     return (
         <Screen>
             <View style={{ flex: 1, padding: 20 }}>
@@ -234,28 +243,54 @@ export default function PlayQuizScreen() {
                 </Text>
 
                 {/* MCQ */}
-                {question.type === 'MCQ' &&
-                    question?.options?.map((option) => (
-                        <Pressable
-                            key={option}
-                            onPress={() => setSelected(option)}
-                            style={{
-                                padding: 14,
-                                borderRadius: 12,
-                                marginBottom: 10,
-                                backgroundColor:
-                                    selected === option ? theme.primary : theme.card,
-                            }}
-                        >
-                            <Text
+                { question.type === 'MULTI_SELECT' &&
+                    question?.options?.map((option) => {
+                        const isSelected =
+                            question.type === 'MCQ'
+                                ? selected === option
+                                : selectedOptions.includes(option);
+
+                        return (
+                            <Pressable
+                                key={option}
+                                onPress={() =>
+                                    question.type === 'MCQ'
+                                        ? setSelected(option)
+                                        : toggleOption(option)
+                                }
                                 style={{
-                                    color: selected === option ? 'white' : theme.text,
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    padding: 14,
+                                    borderRadius: 12,
+                                    marginBottom: 10,
+                                    backgroundColor: isSelected ? theme.primary : theme.card,
                                 }}
                             >
-                                {option}
-                            </Text>
-                        </Pressable>
-                    ))}
+                                {/* Indicator (checkbox / radio style) */}
+                                <View
+                                    style={{
+                                        width: 20,
+                                        height: 20,
+                                        borderRadius: question.type === 'MCQ' ? 10 : 4,
+                                        borderWidth: 2,
+                                        borderColor: isSelected ? 'white' : theme.text,
+                                        marginRight: 10,
+                                        backgroundColor: isSelected ? 'white' : 'transparent',
+                                    }}
+                                />
+
+                                <Text
+                                    style={{
+                                        color: isSelected ? 'white' : theme.text,
+                                        flex: 1,
+                                    }}
+                                >
+                                    {option}
+                                </Text>
+                            </Pressable>
+                        );
+                    })}
 
                 {/* TRUE/FALSE */}
                 {question.type === 'TRUE_FALSE' &&
