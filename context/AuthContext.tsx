@@ -37,9 +37,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const isAuthenticated = !!user;
 
-    // 🔥 Determine correct backend per school
     const baseURL = useMemo(() => {
-        return tenant?.baseURL || "http://192.168.192.8:9000/api/v1";
+        if (!tenant) return null;
+
+        if (tenant.type === "full" && tenant.baseURL) {
+            return tenant.baseURL;
+        }
+        // 🔥 fallback pour independent
+        return ENV.LARAVEL_API;
     }, [tenant]);
 
     // 🔥 Create tenant-aware services

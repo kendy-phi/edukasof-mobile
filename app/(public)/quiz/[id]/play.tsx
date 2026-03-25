@@ -176,6 +176,9 @@ export default function PlayQuizScreen() {
             [question._id]: [selected],
         };
 
+        console.log(`debud saved answers values: `, newAnswers);
+        
+
         setAnswers(newAnswers);
 
         await saveQuizProgress({

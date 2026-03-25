@@ -3,13 +3,13 @@ import { AxiosInstance } from 'axios';
 
 export const quizApi = (api: AxiosInstance) => ({
     all: async () => {
-        console.log(api);
+        console.log(`base url: ${api.defaults.baseURL}`);
         const response = await api.get('/quiz');
         return response.data;
     },
 
     load: async (page = 1, limit = 10) => {
-        console.log(api);
+        console.log(`base url: ${api.defaults.baseURL}`);
         const isPublished = true;
         const response = await api.get('/quiz/search', {
             params: { page, limit, isPublished }

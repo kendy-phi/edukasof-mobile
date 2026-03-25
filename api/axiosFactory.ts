@@ -6,7 +6,7 @@ import { Alert } from "react-native";
 
 export const createApiClient = (tenantUrl: string) => {
 
-    const baseURL = tenantUrl || ENV.NEST_API;
+    const baseURL = tenantUrl || ENV.LARAVEL_API;
 
     const api = axios.create({
         baseURL,

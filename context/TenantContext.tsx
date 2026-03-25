@@ -1,3 +1,4 @@
+import { ENV } from '@/config/env';
 import {
   getBaseUrl,
   getTenantName,
@@ -39,7 +40,7 @@ export const TenantProvider = ({ children }: { children: React.ReactNode }) => {
         setTenantState({
           type: type as InstitutionType,
           name,
-          baseURL: baseURL || "http://192.168.192.8:9000/api/v1",
+          baseURL: baseURL || ENV.LARAVEL_API,
         });
       }
 
@@ -56,7 +57,7 @@ export const TenantProvider = ({ children }: { children: React.ReactNode }) => {
     if (tenant.type === "full" && tenant.baseURL) {
       await saveBaseUrl(tenant.baseURL);
     } else {
-      await saveBaseUrl(""); // pas utilisé en independent
+      await saveBaseUrl(ENV.LARAVEL_API); // pas utilisé en independent
     }
 
     setTenantState(tenant);

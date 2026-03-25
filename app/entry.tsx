@@ -1,3 +1,4 @@
+import { ENV } from '@/config/env';
 import { useTenant } from '@/context/TenantContext';
 import { useTheme } from '@/context/ThemeContext';
 
@@ -28,7 +29,7 @@ export default function EntryScreen() {
     await setTenant({
       type: "independent",
       name: "EdukasoF Quiz",
-      baseURL: "127.0.0.1:9000/api/app"
+      baseURL: ENV.LARAVEL_API
     });
 
     router.replace('/home');
