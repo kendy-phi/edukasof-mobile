@@ -1,4 +1,4 @@
-export type QuestionType = 'MCQ' | 'TRUE_FALSE' | 'SHORT_ANSWER';
+export type QuestionType = 'MULTI_SELECT' | 'MCQ' | 'TRUE_FALSE' | 'SHORT_ANSWER';
 
 export type Question = {
   _id: string;
@@ -9,6 +9,7 @@ export type Question = {
   points: number;
   order: number;
   timer: number | null;
+  correctAnswer?:string[];
   createdAt: string;
   updatedAt: string;
 };

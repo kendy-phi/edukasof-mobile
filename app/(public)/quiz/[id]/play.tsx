@@ -13,18 +13,12 @@ import {
     ActivityIndicator,
     Pressable,
     Text,
-    TextInput,
-    View,
+    View
 } from 'react-native';
 
-import { Answer } from '@/types/question';
-
-type Question = {
-    _id: string;
-    type: 'MCQ' | 'TRUE_FALSE' | 'SHORT_ANSWER' | 'MULTI_SELECT';
-    questionText: string;
-    options?: string[];
-};
+import ProgressBar from '@/components/ProgressBar';
+import QuestionCard from '@/components/QuestionCard';
+import { Answer, Question } from '@/types/question';
 
 export default function PlayQuizScreen() {
     const { id, attemptId } = useLocalSearchParams<{ id: string; attemptId: string }>();
@@ -41,6 +35,7 @@ export default function PlayQuizScreen() {
     const [submitting, setSubmitting] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
 
+    const [timeLeft, setTimeLeft] = useState(0);
     const toggleOption = (option: string) => {
         if (selectedOptions.includes(option)) {
             setSelectedOptions(selectedOptions.filter(o => o !== option));
@@ -62,6 +57,7 @@ export default function PlayQuizScreen() {
             try {
                 console.log(`Load quiz question: `, id);
                 const quiz = await services.quiz.loadQuizWithQuestion(id);
+                setTimeLeft(quiz.duration);
 
                 if (!quiz) return;
 
@@ -89,6 +85,30 @@ export default function PlayQuizScreen() {
 
         loadQuiz();
     }, [id, services, isAuthenticated]);
+
+    /*
+    =========================
+    Timer and text
+    =========================
+    */
+    useEffect(() => {
+        if (timeLeft <= 0 && !submitting) {
+            submitAnswers(answers);
+        }
+
+        const interval = setInterval(() => {
+            setTimeLeft((prev) => prev - 1);
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [timeLeft]);
+
+    const formatTime = (seconds: number) => {
+        const min = Math.floor(seconds / 60);
+        const sec = seconds % 60;
+
+        return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+    };
 
     /*
     =========================
@@ -172,8 +192,6 @@ export default function PlayQuizScreen() {
     =========================
     Next Question
     =========================
-    */
-
     const handleNext = async () => {
         if (!selected) return;
 
@@ -202,7 +220,45 @@ export default function PlayQuizScreen() {
         setCurrentIndex((prev) => prev + 1);
         setSelected(null);
     };
+    */
+    const handleNext = async () => {
+        const question = questions[currentIndex];
 
+        let answerValues: string[] = [];
+
+        if (question.type === 'MULTI_SELECT') {
+            if (selectedOptions.length === 0) return;
+            answerValues = selectedOptions;
+        } else {
+            if (!selected) return;
+            answerValues = [selected];
+        }
+
+        const isLast = currentIndex === questions.length - 1;
+
+        const newAnswers = {
+            ...answers,
+            [question._id]: answerValues,
+        };
+
+        setAnswers(newAnswers);
+
+        await saveQuizProgress({
+            quizId: id,
+            currentIndex: currentIndex + 1,
+            answers: newAnswers,
+        });
+
+        if (isLast) {
+            submitAnswers(newAnswers);
+            clearQuizProgress(id);
+            return;
+        }
+
+        setCurrentIndex((prev) => prev + 1);
+        setSelected(null);
+        setSelectedOptions([]);
+    };
     /*
     =========================
     Loading
@@ -227,115 +283,72 @@ export default function PlayQuizScreen() {
     UI
     =========================
     */
-    console.log(`Question: `, question)
+    // console.log(`Question: `, question)
+    const total = questions.length;
+    const progress = total > 0 ? (currentIndex + 1) / total : 0;
     return (
         <Screen>
             <View style={{ flex: 1, padding: 20 }}>
-                <Text
-                    style={{
-                        fontSize: 20,
-                        fontWeight: '700',
-                        marginBottom: 20,
-                        color: theme.text,
-                    }}
-                >
-                    {question.questionText}
-                </Text>
+                {/* Progress Header */}
+                <View style={{ marginBottom: 20 }}>
+                    <Text
+                        style={{
+                            color: theme.text,
+                            marginBottom: 8,
+                            fontWeight: '700',
+                        }}
+                    >
+                        Question {currentIndex + 1} / {total}
+                    </Text>
+                    <ProgressBar progress={progress} theme={theme} />
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            marginBottom: 10,
+                        }}
+                    >
+                        <Text style={{ color: theme.text }}>
+                            Temps restant
+                        </Text>
 
-                {/* MCQ */}
-                { question.type === 'MULTI_SELECT' &&
-                    question?.options?.map((option) => {
-                        const isSelected =
-                            question.type === 'MCQ'
-                                ? selected === option
-                                : selectedOptions.includes(option);
-
-                        return (
-                            <Pressable
-                                key={option}
-                                onPress={() =>
-                                    question.type === 'MCQ'
-                                        ? setSelected(option)
-                                        : toggleOption(option)
-                                }
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    padding: 14,
-                                    borderRadius: 12,
-                                    marginBottom: 10,
-                                    backgroundColor: isSelected ? theme.primary : theme.card,
-                                }}
-                            >
-                                {/* Indicator (checkbox / radio style) */}
-                                <View
-                                    style={{
-                                        width: 20,
-                                        height: 20,
-                                        borderRadius: question.type === 'MCQ' ? 10 : 4,
-                                        borderWidth: 2,
-                                        borderColor: isSelected ? 'white' : theme.text,
-                                        marginRight: 10,
-                                        backgroundColor: isSelected ? 'white' : 'transparent',
-                                    }}
-                                />
-
-                                <Text
-                                    style={{
-                                        color: isSelected ? 'white' : theme.text,
-                                        flex: 1,
-                                    }}
-                                >
-                                    {option}
-                                </Text>
-                            </Pressable>
-                        );
-                    })}
-
-                {/* TRUE/FALSE */}
-                {question.type === 'TRUE_FALSE' &&
-                    ['True', 'False'].map((option) => (
-                        <Pressable
-                            key={option}
-                            onPress={() => setSelected(option)}
+                        <Text
                             style={{
-                                padding: 14,
-                                borderRadius: 12,
-                                marginBottom: 10,
-                                backgroundColor:
-                                    selected === option ? theme.primary : theme.card,
+                                color: timeLeft < 60 ? 'red' : theme.text,
+                                fontWeight: 'bold',
                             }}
                         >
-                            <Text
-                                style={{
-                                    color: selected === option ? 'white' : theme.text,
-                                }}
-                            >
-                                {option === 'True' ? 'VRAI' : 'FAUX'}
-                            </Text>
-                        </Pressable>
-                    ))}
+                            {formatTime(timeLeft)}
+                        </Text>
+                    </View>
+                    
+                </View>
 
-                {/* SHORT ANSWER */}
-                {question.type === 'SHORT_ANSWER' && (
-                    <TextInput
-                        value={selected ?? ''}
-                        onChangeText={setSelected}
-                        placeholder="Votre réponse..."
-                        placeholderTextColor={theme.text}
-                        style={{
-                            borderWidth: 1,
-                            borderColor: theme.border,
-                            borderRadius: 12,
-                            padding: 14,
-                            color: theme.text
-                        }}
-                    />
-                )}
-
+                {/* Question */}
+                <QuestionCard
+                    question={question}
+                    selected={selected}
+                    selectedOptions={selectedOptions}
+                    setSelected={setSelected}
+                    setSelectedOptions={setSelectedOptions}
+                    theme={theme}
+                />
+                <View style={
+                    {
+                        marginTop: 10
+                    }
+                }>
+                    <Text style={{ color: theme.text, fontSize: 12, marginTop: 4 }}>
+                        {Math.round(progress * 100)}% complété
+                    </Text>
+                </View>
                 {/* NEXT BUTTON */}
                 <Pressable
-                    disabled={!selected}
+                    disabled={
+                        question.type === 'MULTI_SELECT'
+                            ? selectedOptions.length == 0
+                            : !selected
+                    }
                     onPress={handleNext}
                     style={{
                         marginTop: 'auto',
