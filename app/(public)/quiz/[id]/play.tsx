@@ -8,7 +8,7 @@ import {
     saveQuizProgress,
 } from '@/utils/quizProgress';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
     Pressable,
@@ -91,16 +91,29 @@ export default function PlayQuizScreen() {
     Timer and text
     =========================
     */
+        const intervalRef = useRef<number | null>(null);
+
     useEffect(() => {
-        if (timeLeft <= 0 && !submitting) {
-            submitAnswers(answers);
+        if (timeLeft <= 0) {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
+
+            if (!submitting) {
+                submitAnswers(answers);
+            }
+            return;
         }
 
-        const interval = setInterval(() => {
-            setTimeLeft((prev) => prev - 1);
+        intervalRef.current = setInterval(() => {
+            setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
         }, 1000);
 
-        return () => clearInterval(interval);
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
+        };
     }, [timeLeft]);
 
     const formatTime = (seconds: number) => {
