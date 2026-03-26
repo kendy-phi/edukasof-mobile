@@ -38,6 +38,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const isAuthenticated = !!user;
 
     const baseURL = useMemo(() => {
+        console.log(`check tenant init in usememo authcontext: `, tenant);
         if (!tenant) return null;
 
         if (tenant.type === "full" && tenant.baseURL) {
@@ -49,18 +50,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // 🔥 Create tenant-aware services
     const services = useMemo(() => {
-        if (!baseURL) return null;
+        console.log(`Base url loading: ${baseURL}`);        
+        if (!baseURL) return null; 
         return createServices(baseURL);
     }, [baseURL]);
 
     // 🔄 Initialize Auth
     useEffect(() => {
         const initializeAuth = async () => {
+            console.log(`init auth and check tenant status tloading:${tenantLoading}`,services);
+            
             if (tenantLoading || !services) return;           
 
             try {
                 const token = await getToken();
                 if (!token) {
+                    console.log(`load token: ${token}`);                    
                     setUser(null);
                     return;
                 }
@@ -73,6 +78,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 await clearAllAuthStorage();
                 setUser(null);
             } finally {
+                console.log(`end loading process`);                
                 setLoading(false);
             }
         };

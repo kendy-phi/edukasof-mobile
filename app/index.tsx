@@ -10,21 +10,25 @@ export default function Index() {
   const { isAuthenticated, loading: authLoading } = useAuth();
 
   useEffect(() => {
+    console.log(`Loading tenant`, tenantLoading, authLoading);
+    
     if (tenantLoading || authLoading) return;
 
     // 🔐 Déjà connecté → dashboard
     if (isAuthenticated) {
+      console.log(`Already auth redirect to dashboard`);
       router.replace('/dashboard');
       return;
     }
 
     // 🏫 Tenant déjà sélectionné → login
     if (tenant) {
-      console.log(tenant, isAuthenticated)
+      console.log(`Load teanant and redirected to home page: `,tenant, isAuthenticated)
       router.replace('/home');
       return;
     }
-
+    console.log(`retdirect to entry page.`);
+    
     // ❌ Aucun tenant → écran d’entrée
     router.replace('/entry');
   }, [tenant, tenantLoading, isAuthenticated, authLoading]);

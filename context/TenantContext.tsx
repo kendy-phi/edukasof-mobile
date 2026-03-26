@@ -39,8 +39,7 @@ export const TenantProvider = ({ children }: { children: React.ReactNode }) => {
       if (type && name) {
         setTenantState({
           type: type as InstitutionType,
-          name,
-          baseURL: baseURL || ENV.LARAVEL_API,
+          name
         });
       }
 
@@ -51,9 +50,10 @@ export const TenantProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const setTenant = async (tenant: Tenant) => {
+    console.log(`Store tenant value: `, tenant);
+    
     await saveTenantType(tenant.type);
     await saveTenantName(tenant.name);
-
     if (tenant.type === "full" && tenant.baseURL) {
       await saveBaseUrl(tenant.baseURL);
     } else {
