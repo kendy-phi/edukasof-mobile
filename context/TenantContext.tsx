@@ -39,7 +39,8 @@ export const TenantProvider = ({ children }: { children: React.ReactNode }) => {
       if (type && name) {
         setTenantState({
           type: type as InstitutionType,
-          name
+          name,
+          baseURL: baseURL || undefined
         });
       }
 

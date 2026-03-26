@@ -1,7 +1,6 @@
 import { ENV } from '@/config/env';
 import { useTenant } from '@/context/TenantContext';
 import { useTheme } from '@/context/ThemeContext';
-
 import { useRouter } from 'expo-router';
 import {
   Image,

@@ -38,14 +38,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const isAuthenticated = !!user;
 
     const baseURL = useMemo(() => {
-        console.log(`check tenant init in usememo authcontext: `, tenant);
-        if (!tenant) return null;
-
-        if (tenant.type === "full" && tenant.baseURL) {
-            return tenant.baseURL;
-        }
-        // 🔥 fallback pour independent
-        return ENV.LARAVEL_API;
+        return tenant?.baseURL || ENV.LARAVEL_API
     }, [tenant]);
 
     // 🔥 Create tenant-aware services
