@@ -186,8 +186,9 @@ export default function PlayQuizScreen() {
 
             if (data) {
                 router.replace({
-                    pathname: `/quiz/${id}/result`,
+                    pathname: `/quiz/[id]/result`,
                     params: {
+                        id:id,
                         score: data.score.toString(),
                         total: data.totalPoints.toString(),
                         percentage: data.percentage.toFixed(0),
