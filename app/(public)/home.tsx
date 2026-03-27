@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-	ActivityIndicator,
-	RefreshControl,
-	ScrollView,
-	View,
+  ActivityIndicator,
+  RefreshControl,
+  ScrollView,
+  View,
 } from 'react-native';
 
 import CategoryTabs from '@/components/CategoryTabs';
@@ -15,7 +15,7 @@ import SkeletonCard from '@/components/SkeletonCard';
 import SkeletonFeatured from '@/components/SkeletonFeatured';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
-import { getAllQuizProgress } from '@/utils/quizProgress';
+import { getAllQuizProgress } from '@/utils/quiz/quizProgress';
 import { useRouter } from 'expo-router';
 
 

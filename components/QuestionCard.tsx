@@ -19,6 +19,8 @@ export default function QuestionCard({
   theme,
 }: Props) {
   const toggleOption = (option: string) => {
+    console.log(`toggleOption: `, option);
+    
     if (selectedOptions.includes(option)) {
       setSelectedOptions(selectedOptions.filter(o => o !== option));
     } else {

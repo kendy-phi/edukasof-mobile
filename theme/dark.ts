@@ -1,5 +1,6 @@
 export const darkTheme = {
     background: '#0f172a',
+    modalBackground: 'rgba(0,0,0,0.5)',
     card: '#1e293b',
     text: '#f1f5f9',
     logoText: '#ffffff',
