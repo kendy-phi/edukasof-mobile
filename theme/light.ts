@@ -1,6 +1,7 @@
 
 export const lightTheme = {
     background: '#f7fafc',
+    modalBackground: 'rgba(0,0,0,0.5)',
     card: '#ffffff',
     text: '#0f172a',
     logoText: '#ffffff',

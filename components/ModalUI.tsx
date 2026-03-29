@@ -17,14 +17,14 @@ export default function CustomModal({ visible, setVisible, modalTitle, bodyText 
       <View
         style={{
           flex: 1,
-          backgroundColor: theme.background,
+          backgroundColor: theme?.modalBackground || 'rgba(0,0,0,0.5)',
           justifyContent: 'center',
           padding: 24,
         }}
       >
         <View
           style={{
-            backgroundColor: theme.primary,
+            backgroundColor: theme.background,
             padding: 20,
             borderRadius: 20,
           }}
@@ -47,13 +47,13 @@ export default function CustomModal({ visible, setVisible, modalTitle, bodyText 
           <Pressable
             onPress={() => { setVisible(false)}}
             style={{
-              backgroundColor: theme.background,
+              backgroundColor: theme.primary,
               padding: 12,
               borderRadius: 12,
               alignItems: 'center',
             }}
           >
-            <Text style={{ color: theme.text, fontWeight: '600' }}>
+            <Text style={{ color: theme.buttonText, fontWeight: '600' }}>
              OK
             </Text>
           </Pressable>

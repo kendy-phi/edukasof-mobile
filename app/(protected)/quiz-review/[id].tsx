@@ -1,4 +1,5 @@
 import { useAuth } from '@/context/AuthContext';
+import { analyzeMultiAnswer } from '@/utils/analyzeAnswer';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
@@ -24,18 +25,17 @@ export default function QuizReview() {
     const { id, quizName } = useLocalSearchParams();
     const [data, setData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const {services} = useAuth();
+    const { services } = useAuth();
 
 
     useEffect(() => {
         const loadReview = async () => {
             try {
                 const response = await services?.dashboard?.getUserQuizInput(id.toString()); //getUserQuizInput(id.toString());
-                //console.log(`response from quiz history`,response, id, quizName);
-                
+                //console.log(`response from quiz history`,response, id, quizName);                
                 setData(response);
             } catch (error) {
-                console.log("Quiz history ==> ",error);
+                console.log("Quiz history ==> ", error);
             } finally {
                 setLoading(false);
             }
@@ -52,13 +52,67 @@ export default function QuizReview() {
         );
     }
 
+    const renderReview = (item: any, userAnswer: string[]) => {
+        const question = item.question;
+        const isMulti = question.type == 'MULTI_SECLECT' || question.correctAnswer.length > 1;
+        console.log(`item:- `, item);
+
+        if (isMulti) {
+            const analysis = analyzeMultiAnswer(question.correctAnswer, userAnswer);
+            console.log(`Analysis: `, analysis);
+
+
+            return (
+                <View id={item.questionId}>
+                    {/* Résultat global */}
+                    <Text>
+                        {analysis.isPerfect ? '✅ Correct' : '⚠️ Réponse partielle'}
+                    </Text>
+
+                    {/* Bonnes réponses choisies */}
+                    {analysis.correctAnswers.length > 0 && (
+                        <Text style={{ color: 'green' }}>
+                            ✔️ {analysis.correctAnswers.join(', ')}
+                        </Text>
+                    )}
+
+                    {/* Mauvaises réponses */}
+                    {analysis.wrongAnswers.length > 0 && (
+                        <Text style={{ color: 'red' }}>
+                            ❌ {analysis.wrongAnswers.join(', ')}
+                        </Text>
+                    )}
+
+                    {/* Réponses manquantes */}
+                    {analysis.missingAnswers.length > 0 && (
+                        <Text style={{ color: 'orange' }}>
+                            📌 Manquant : {analysis.missingAnswers.join(', ')}
+                        </Text>
+                    )}
+                </View>
+            )
+        }
+
+        // MCQ / TRUE_FALSE / SHORT
+        const isCorrect =
+            JSON.stringify(userAnswer) ===
+            JSON.stringify(question.correctAnswer);
+
+        return (
+            <Text id={item.questionId}>
+                {isCorrect ? '✅ Correct' : '❌ Incorrect'}
+            </Text>
+        );
+
+    }
+
     return (
         <ScrollView style={styles.container}>
             <Text style={styles.title}>Révision des questions: {quizName}</Text>
 
             {data.map((item, index) => {
-                console.log("user entry ==> ", item);
-                
+                // console.log("user entry ==> ", item);
+
                 return (
 
                     <View key={index} style={item.isCorrect ? styles.card_success : styles.card_failed}>
@@ -80,19 +134,36 @@ export default function QuizReview() {
                         </View>
 
                         <Text style={styles.answer}>
-                            Votre reponse: {item.studentAnswer}
+                            Votre reponse: {item.studentAnswer.join(', ')}
                         </Text>
+
+                        {renderReview(item, item.studentAnswer)}
 
                         {!item.isCorrect && (
                             <Text style={styles.correctAnswer}>
-                                Reponse correcte: {item?.question?.correctAnswer}
+                                Reponse correcte: {item?.question?.correctAnswer.join(', ')}
+                            </Text>
+                        )}
+                        
+                        {item.explanation && (
+                            <Text
+                                style={{
+                                    marginTop: 6,
+                                    color: '#64748b',
+                                    fontSize: 13,
+                                }}
+                            >
+                                💡 {item.explanation}
                             </Text>
                         )}
                     </View>
-                )}
+
+                )
+
+            }
             )}
             <View style={styles.actions}>
-                <Pressable style={styles.primaryButton} onPress={() =>{ router.replace('/dashboard')}}>
+                <Pressable style={styles.primaryButton} onPress={() => { router.replace('/dashboard') }}>
                     <Text style={styles.primaryText}> Tableau de bord</Text>
                 </Pressable>
 

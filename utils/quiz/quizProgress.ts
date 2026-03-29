@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { resetGuestQuizCount } from './guestLimit';
+import { resetGuestQuizCount } from '../guestLimit';
 
 const KEY = 'EDUKASOF_QUIZ_PROGRESS';
 
@@ -7,11 +7,12 @@ type QuizProgress = {
   quizId: string;
   currentIndex: number;
   answers: Record<string, string[]>;
+  time: number
 };
 
 export const saveQuizProgress = async (data: QuizProgress) => {
   const saved = await AsyncStorage.getItem(KEY);
-
+  console.log(`saved quiz`, data, saved);
   const allProgress = saved ? JSON.parse(saved) : {};
 
   // Save per quizId
@@ -22,12 +23,17 @@ export const saveQuizProgress = async (data: QuizProgress) => {
 
 export const getQuizProgress = async (quizId: string) => {
   const saved = await AsyncStorage.getItem(KEY);
-
+  console.log(`load saved quiz`, saved);
+  
   if (!saved) return null;
 
   const allProgress = JSON.parse(saved);
 
-  return allProgress[quizId] || null;
+  const data = allProgress[quizId] || null;
+
+  console.log(`return quiz loaded: `, data, `quid id ==> `, quizId);  
+
+  return data
 };
 
 export const getAllQuizProgress = async () => {

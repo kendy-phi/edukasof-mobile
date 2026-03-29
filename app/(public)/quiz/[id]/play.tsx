@@ -6,7 +6,7 @@ import {
     clearQuizProgress,
     getQuizProgress,
     saveQuizProgress,
-} from '@/utils/quizProgress';
+} from '@/utils/quiz/quizProgress';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -18,7 +18,8 @@ import {
 
 import ProgressBar from '@/components/ProgressBar';
 import QuestionCard from '@/components/QuestionCard';
-import { Answer, Question } from '@/types/question';
+import { Question } from '@/types/question';
+import { quizApi } from '@/api/quiz';
 
 export default function PlayQuizScreen() {
     const { id, attemptId } = useLocalSearchParams<{ id: string; attemptId: string }>();
@@ -31,7 +32,6 @@ export default function PlayQuizScreen() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [selected, setSelected] = useState<string | null>(null);
     const [answers, setAnswers] = useState<Record<string, string[]>>({});
-    const [bulkAnswers, setBulkAnswers] = useState<Answer[]>([]);
     const [submitting, setSubmitting] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
 
@@ -57,7 +57,7 @@ export default function PlayQuizScreen() {
             try {
                 console.log(`Load quiz question: `, id);
                 const quiz = await services.quiz.loadQuizWithQuestion(id);
-                setTimeLeft(quiz.duration);
+                setTimeLeft(quiz.duration * 60);
 
                 if (!quiz) return;
 
@@ -91,30 +91,50 @@ export default function PlayQuizScreen() {
     Timer and text
     =========================
     */
-        const intervalRef = useRef<number | null>(null);
+    const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     useEffect(() => {
-        if (timeLeft <= 0) {
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current);
+        if(!loading){
+            if (timeLeft <= 0) {
+                if (intervalRef.current) {
+                    clearInterval(intervalRef.current);
+                }
+    
+                handleTimeUp(); // 🔥 logique métier ici
+                return;
             }
+    
+            intervalRef.current = setInterval(() => {
+                setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
+            }, 1000);
+    
+            return () => {
+                if (intervalRef.current) {
+                    clearInterval(intervalRef.current);
+                }
+            };
+        }
+    }, [timeLeft]);
 
-            if (!submitting) {
-                submitAnswers(answers);
-            }
+    const handleTimeUp = async () => {
+        const isCompleted = Object.keys(answers).length === questions.length && questions.length > 0;
+
+        if (isCompleted) {
+            console.log(`time is up is completed: ${isCompleted}`, `answers length: ==> `,Object.keys(answers).length, `Question length ==> `,questions.length);            
+            submitAnswers(answers, "handleTimeUp");
             return;
         }
 
-        intervalRef.current = setInterval(() => {
-            setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
-        }, 1000);
+        await clearQuizProgress(id);
 
-        return () => {
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current);
-            }
-        };
-    }, [timeLeft]);
+        router.replace({
+            pathname: `/quiz/[id]`,
+            params: {
+                id: id,
+                message: "⏱️ Temps écoulé. Vous n’avez pas terminé le quiz.",
+            },
+        });
+    };
 
     const formatTime = (seconds: number) => {
         const min = Math.floor(seconds / 60);
@@ -134,19 +154,19 @@ export default function PlayQuizScreen() {
 
         const recover = async () => {
             const progress = await getQuizProgress(id);
-            console.log(`Recover quiz answers: `, progress);
 
             if (!progress || progress.quizId !== id) return;
 
             // 🔥 Quiz déjà terminé mais pas encore soumis
             if (progress.currentIndex >= questions.length) {
                 console.log("Quiz completed previously, submitting...");
-                submitAnswers(progress.answers);
+                submitAnswers(progress.answers, "recover");
                 return;
             }
 
             setCurrentIndex(progress.currentIndex);
             setAnswers(progress.answers);
+            setTimeLeft(progress.time == 0 ? timeLeft : progress.time)
 
             const q = questions[progress.currentIndex];
 
@@ -164,9 +184,10 @@ export default function PlayQuizScreen() {
     =========================
     */
 
-    const submitAnswers = async (finalAnswers: Record<string, string[]>) => {
-        if (!services?.quiz || submitting) return;
-        console.log(`Submit quiz answers: `, finalAnswers);
+    const submitAnswers = async (finalAnswers: Record<string, string[]>, method: string) => {
+        console.log('Called by:', method);
+        console.log(`Submit quiz answers: `, services?.quiz, submitting, finalAnswers);
+        if (!services?.quiz || submitting || Object.keys(finalAnswers).length != questions.length) return;
         setSubmitting(true)
         try {
             const payload = {
@@ -186,8 +207,9 @@ export default function PlayQuizScreen() {
 
             if (data) {
                 router.replace({
-                    pathname: `/quiz/${id}/result`,
+                    pathname: `/quiz/[id]/result`,
                     params: {
+                        id: id,
                         score: data.score.toString(),
                         total: data.totalPoints.toString(),
                         percentage: data.percentage.toFixed(0),
@@ -205,38 +227,8 @@ export default function PlayQuizScreen() {
     =========================
     Next Question
     =========================
-    const handleNext = async () => {
-        if (!selected) return;
-
-        const question = questions[currentIndex];
-        const isLast = currentIndex === questions.length - 1;
-
-        const newAnswers = {
-            ...answers,
-            [question._id]: [selected],
-        };
-
-        console.log(`debud saved answers values: `, newAnswers);
-        
-
-        setAnswers(newAnswers);
-
-        await saveQuizProgress({
-            quizId: id,
-            currentIndex: currentIndex + 1,
-            answers: newAnswers,
-        });
-
-        if (isLast) {
-            submitAnswers(newAnswers);
-            clearQuizProgress(id);
-            return;
-        }
-
-        setCurrentIndex((prev) => prev + 1);
-        setSelected(null);
-    };
     */
+   
     const handleNext = async () => {
         const question = questions[currentIndex];
 
@@ -247,7 +239,10 @@ export default function PlayQuizScreen() {
             answerValues = selectedOptions;
         } else {
             if (!selected) return;
-            answerValues = [selected];
+            if (question.type == 'TRUE_FALSE')
+                answerValues = [selected == 'True' ? 'Vrai' : 'Faux']
+            else
+                answerValues = [selected];
         }
 
         const isLast = currentIndex === questions.length - 1;
@@ -263,10 +258,13 @@ export default function PlayQuizScreen() {
             quizId: id,
             currentIndex: currentIndex + 1,
             answers: newAnswers,
+            time: timeLeft
         });
 
+        console.log(`is last: `, isLast);
+
         if (isLast) {
-            submitAnswers(newAnswers);
+            submitAnswers(newAnswers, "handleNext");
             clearQuizProgress(id);
             return;
         }
@@ -337,7 +335,7 @@ export default function PlayQuizScreen() {
                             {formatTime(timeLeft)}
                         </Text>
                     </View>
-                    
+
                 </View>
 
                 {/* Question */}
@@ -368,7 +366,7 @@ export default function PlayQuizScreen() {
                     onPress={handleNext}
                     style={{
                         marginTop: 'auto',
-                        backgroundColor: selected ? theme.primary : '#94a3b8',
+                        backgroundColor: selected || selectedOptions.length > 0 ? theme.primary : '#94a3b8',
                         paddingVertical: 16,
                         borderRadius: 14,
                         alignItems: 'center',

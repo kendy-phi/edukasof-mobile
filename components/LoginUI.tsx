@@ -1,5 +1,6 @@
 import { Tenant } from '@/context/TenantContext';
 import { useTheme } from '@/context/ThemeContext';
+import { useLocalSearchParams } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import {
     ActivityIndicator,
@@ -130,7 +131,9 @@ export default function LoginScreen({
     const [showPassword, setShowPassword] = useState(false);
     const [showName, setShowName] = useState(false);
     const { theme } = useTheme();
-
+    const { message } = useLocalSearchParams<{ message: string }>();
+    const loginMessage = message || "Connectez-vous pour débloquer un accès illimité";
+    console.log(`message: `, message)
     const styles = _styles_(theme);
     return (
         <KeyboardAvoidingView
@@ -149,7 +152,7 @@ export default function LoginScreen({
 
                 {/* Heading */}
                 <Text style={styles.heading}>Bon retour</Text>
-                <Text style={styles.subtitle}>Connectez-vous pour débloquer un accès illimité</Text>
+                <Text style={styles.subtitle}>{loginMessage}</Text>
 
                 {/* Fields */}
                 {tenant?.type === 'full' && (<Field
