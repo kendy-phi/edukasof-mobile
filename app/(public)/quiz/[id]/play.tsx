@@ -19,7 +19,7 @@ import {
 import ProgressBar from '@/components/ProgressBar';
 import QuestionCard from '@/components/QuestionCard';
 import { Question } from '@/types/question';
-import { quizApi } from '@/api/quiz';
+import { formatTime } from '@/utils/quiz/startQuiz';
 
 export default function PlayQuizScreen() {
     const { id, attemptId } = useLocalSearchParams<{ id: string; attemptId: string }>();
@@ -134,13 +134,6 @@ export default function PlayQuizScreen() {
                 message: "⏱️ Temps écoulé. Vous n’avez pas terminé le quiz.",
             },
         });
-    };
-
-    const formatTime = (seconds: number) => {
-        const min = Math.floor(seconds / 60);
-        const sec = seconds % 60;
-
-        return `${min}:${sec < 10 ? '0' : ''}${sec}`;
     };
 
     /*

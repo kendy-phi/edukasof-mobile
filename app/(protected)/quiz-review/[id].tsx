@@ -107,6 +107,7 @@ export default function QuizReview() {
     }
 
     return (
+        <>
         <ScrollView style={styles.container}>
             <Text style={styles.title}>Révision des questions: {quizName}</Text>
 
@@ -166,18 +167,14 @@ export default function QuizReview() {
                 <Pressable style={styles.primaryButton} onPress={() => { router.replace('/dashboard') }}>
                     <Text style={styles.primaryText}> Tableau de bord</Text>
                 </Pressable>
-
-                {/* <Pressable style={styles.secondaryButton} onPress={() =>{ router.replace('/(protected)/(tabs)/quizzes')}}>
-                    <Text style={styles.secondaryText}> Lister Quiz</Text>
-                </Pressable> */}
             </View>
         </ScrollView>
-    );
+    </>);
 }
 
 const styles = StyleSheet.create({
     actions: {
-        marginBottom: 20,
+        marginBottom: 100,
     },
 
     primaryButton: {

@@ -59,8 +59,9 @@ export async function handleStartQuiz({
     
             // 🚀 Start quiz
             attempt = await services?.quiz?.startQuiz(id);
+            console.log(`attempt response: `, attempt)
     
-            if (attempt._id) {
+            if (!attempt._id) {
                 setClick(false);
                 throw new Error('Invalid attempt response');
             }
@@ -77,3 +78,10 @@ export async function handleStartQuiz({
         console.log('❌ Error starting quiz:', e);
     }
 }
+
+export const formatTime = (seconds: number) => {
+    const min = Math.floor(seconds / 60);
+    const sec = seconds % 60;
+
+    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+};

@@ -1,5 +1,8 @@
 
 export const ENV = {
-  LARAVEL_API: "https://staging.edukasof.com/api/v1",
-  NEST_API: "https://staging.edukasof.com/api/v1" //"http://192.168.192.8:9000/api/v1" //'https://quiz-api.edukasof.com/api/v1' //'http://10.204.175.24:3250/api/v1' //
+  LARAVEL_API: `${process.env.EXPO_PUBLIC_API_BASE_URL}/api/v1` || "https://staging.edukasof.com/api/v1",
+  NEST_API: `${process.env.EXPO_PUBLIC_API_BASE_URL}/api/v1` || "https://staging.edukasof.com/api/v1"
 };
+
+// console.log(`expo variable for api url ==> process.env.EXPO_PUBLIC_API_BASE_URL: ${process.env.EXPO_PUBLIC_API_BASE_URL}`);
+// console.log(`config variable for api url ==> ENV.LARAVEL_API: ${ENV.LARAVEL_API}`);

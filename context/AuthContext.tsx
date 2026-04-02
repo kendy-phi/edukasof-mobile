@@ -38,6 +38,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const isAuthenticated = !!user;
 
     const baseURL = useMemo(() => {
+        // if(!tenant) return;
+        console.log(`Tenant on auth context: `, tenant);
         return tenant?.baseURL || ENV.LARAVEL_API
     }, [tenant]);
 

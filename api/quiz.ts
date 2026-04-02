@@ -34,7 +34,7 @@ export const quizApi = (api: AxiosInstance) => ({
     },
 
     startQuiz: async (quizId: string) => {
-        const response = await api.post(`/quiz/play`,{
+        const response = await api.post(`/quiz/start`,{
             quizId
         });
         return response.data;
@@ -63,7 +63,7 @@ export const quizApi = (api: AxiosInstance) => ({
 
     validate: async (data:any, id:string, auth:boolean) => {
         console.log("parse data to submit: ", data, " for id: ", id, "auth: ", auth);
-        const response = await api.post(`/quiz/validation/${id}?auth=${auth}`, data);///answers/validation/${id}
+        const response = await api.post(`/quiz/completed/${id}`, data);///answers/validation/${id}
         return response.data;
     }    
 

@@ -45,7 +45,7 @@ export default function HomeHeader({
     const removeCache = () => {
         // deleteQuizzesProgress();
         clearAllAuthStorage();
-        router.replace('/login');
+        router.replace('/entry');
     };
 
     return (
@@ -111,7 +111,7 @@ export default function HomeHeader({
                 </Pressable>
                 )}
 
-                {/* clear cache to remove 
+                {/* clear cache to remove */}
                 <Pressable
                     onPress={removeCache}
                     style={{
@@ -136,7 +136,7 @@ export default function HomeHeader({
                         🧼 caches
                     </Text>
                 </Pressable>
-                */}
+                
 
                 {!isAuthenticated && (
                     <Pressable

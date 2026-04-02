@@ -35,7 +35,7 @@ export const TenantProvider = ({ children }: { children: React.ReactNode }) => {
       const type = await getTenantType();
       const name = await getTenantName();
       const baseURL = await getBaseUrl();
-
+      console.log(`loadTenant method==> type: ${type}, name: ${name}, base-url: ${baseURL}`);
       if (type && name) {
         setTenantState({
           type: type as InstitutionType,

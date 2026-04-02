@@ -10,12 +10,20 @@
     },
     "preview": {
       "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_LARAVEL_API": "https://staging.edukasof.com/api/v1",
+        "EXPO_PUBLIC_NEST_API": "https://staging.edukasof.com/api/v1"
+      },
       "android": {
         "buildType": "apk"
       }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_LARAVEL_API": "https://core.edukasof.com/api/v1",
+        "EXPO_PUBLIC_NEST_API": "https://core.edukasof.com/api/v1"
+      }
     }
   },
   "submit": {
