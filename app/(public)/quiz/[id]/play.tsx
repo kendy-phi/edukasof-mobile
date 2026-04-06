@@ -119,21 +119,9 @@ export default function PlayQuizScreen() {
     const handleTimeUp = async () => {
         const isCompleted = Object.keys(answers).length === questions.length && questions.length > 0;
 
-        if (isCompleted) {
-            console.log(`time is up is completed: ${isCompleted}`, `answers length: ==> `,Object.keys(answers).length, `Question length ==> `,questions.length);            
-            submitAnswers(answers, "handleTimeUp");
-            return;
-        }
-
-        await clearQuizProgress(id);
-
-        router.replace({
-            pathname: `/quiz/[id]`,
-            params: {
-                id: id,
-                message: "⏱️ Temps écoulé. Vous n’avez pas terminé le quiz.",
-            },
-        });
+        console.log(`time is up is completed: ${isCompleted}`, `answers length: ==> `,Object.keys(answers).length, `Question length ==> `,questions.length);            
+        
+        return submitAnswers(answers, "handleTimeUp");
     };
 
     /*
@@ -185,6 +173,7 @@ export default function PlayQuizScreen() {
         try {
             const payload = {
                 attemptId,
+                wasTimeout: timeLeft == 0,
                 answers: Object.keys(finalAnswers).map((key) => ({
                     key,
                     value: finalAnswers[key],
