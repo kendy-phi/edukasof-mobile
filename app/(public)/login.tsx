@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 
 export default function LoginScreen() {
   const { login, register, loading } = useAuth();
-  const { tenant } = useTenant();
+  const { tenant, setTenant } = useTenant();
   const [school, setSchool] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -23,13 +23,19 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     console.log("Login event engage");
 
+    if(tenant && tenant.type == "full"){
+      tenant.baseURL = school;
+      setTenant(tenant);
+    }
+
     if (!email || !password) {
       setTitle("Erreur");
       setBody("Veuillez remplir tous les champs: mail, mot de passe");
       setVisible(true);
       return;
     }
-
+    console.log(`login with email: ${email}, password: ${password}`);
+    
     try {
       setSubmitting(true);
       await login(email, password);

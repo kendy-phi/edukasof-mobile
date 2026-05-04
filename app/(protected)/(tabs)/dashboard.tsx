@@ -40,17 +40,18 @@ export default function Dashboard() {
         setLoading(true);
 
         if (isFull) {
-          const school = await getSchoolDashboard();
-          setSchoolData(school);
+          // const school = await getSchoolDashboard();
+          // setSchoolData(school);
         }
 
         const stats = await services?.dashboard?.getQuizStats();//getQuizStats();
         setQuizStats(stats);
-        // console.log("Quiz statistic:", stats);
+        // console.log("Quiz statistic:", stats);.
 
 
         const history = await services?.dashboard?.getQuizHistory();//console.log(history);
-        //getQuizHistory();
+        console.log("History quizzes: ", history);
+        
         setQuizHistory(history);
 
       } catch (error: any) {

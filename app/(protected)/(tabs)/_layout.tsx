@@ -6,7 +6,7 @@ export default function TabsLayout() {
   const { theme } = useTheme();
   return (
     <Tabs
-        backBehavior="history"
+      backBehavior="history"
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: theme.primary,

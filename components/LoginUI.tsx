@@ -133,7 +133,7 @@ export default function LoginScreen({
     const { theme } = useTheme();
     const { message } = useLocalSearchParams<{ message: string }>();
     const loginMessage = message || "Connectez-vous pour débloquer un accès illimité";
-    console.log(`message: `, message)
+    // console.log(`message: `, message)
     const styles = _styles_(theme);
     return (
         <KeyboardAvoidingView
