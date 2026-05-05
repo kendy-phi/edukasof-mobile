@@ -18,7 +18,7 @@
         "backgroundImage": "./assets/images/splash.png",
         "monochromeImage": "./assets/images/splash.png"
       },
-      "package": "com.kendy92.edukasofmobile"
+      "package": "com.edukasof.quiz"
     },
     "plugins": [
       "expo-router",

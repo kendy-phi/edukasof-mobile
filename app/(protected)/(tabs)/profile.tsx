@@ -129,6 +129,7 @@ StyleSheet.create({
     container: {
         padding: 20,
         backgroundColor: C.background,
+        height: '100%'
     },
     header: {
         alignItems: "center",

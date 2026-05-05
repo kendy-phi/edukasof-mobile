@@ -268,6 +268,7 @@ const _styles_ = (C: any) =>
             justifyContent: 'center',
             paddingHorizontal: 28,
             paddingVertical: 48,
+            flex: 1
         },
 
         logoMark: {
