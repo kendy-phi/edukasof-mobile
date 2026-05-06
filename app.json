@@ -2,7 +2,7 @@
   "expo": {
     "name": "edukasof",
     "slug": "edukasof-mobile",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "default",
     "icon": "./assets/images/splash.png",
     "scheme": "edukasofmobile",
@@ -18,7 +18,8 @@
         "backgroundImage": "./assets/images/splash.png",
         "monochromeImage": "./assets/images/splash.png"
       },
-      "package": "com.edukasof.quiz"
+      "package": "com.edukasof.quiz",
+      "versionCode": 7
     },
     "plugins": [
       "expo-router",
