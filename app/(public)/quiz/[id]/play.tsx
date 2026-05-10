@@ -1,7 +1,7 @@
 import Screen from '@/components/Screen';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
-import { incrementGuestQuizCount } from '@/utils/guestLimit';
+import { incrementGuestQuizCount, getGuestQuizCount } from '@/utils/guestLimit';
 import {
     clearQuizProgress,
     getQuizProgress,
@@ -180,11 +180,14 @@ export default function PlayQuizScreen() {
                 })),
             };
 
+            console.log(`payload to send for quiz validation: `, payload);
+
             const data = await services.quiz.validate(payload, id, isAuthenticated);
-            console.log(`Quiz validate response: `, data);
+            // console.log(`Quiz validate response: `, data);
 
             if (!isAuthenticated) {
                 await incrementGuestQuizCount();
+                console.log(`not auth imcreament guest question count: `, getGuestQuizCount());
             }
 
             if (data) {

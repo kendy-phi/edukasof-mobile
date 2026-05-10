@@ -99,26 +99,46 @@ export default function QuizDetailScreen() {
         />
         <CustomModal visible={visible} setVisible={setVisible} modalTitle={quiz.title} bodyText={message} />
         {/* Start button */}
-        <Pressable
-          onPress={ ()  => handleStartQuiz({
-            isAuthenticated,
-            quiz,
-            id,
-            router,
-            services,
-            setClick,
-            setReached,
-            setShowLimitModal
-          })}
-          disabled={click}
-          style={styles.btnContainer}
-        >
-          <Text
-            style={styles.btnStartQuiz}
-          >
-            Start Quiz
-          </Text>
-        </Pressable>
+<Pressable
+  onPress={() =>
+    handleStartQuiz({
+      isAuthenticated,
+      quiz,
+      id,
+      router,
+      services,
+      setClick,
+      setReached,
+      setShowLimitModal,
+    })
+  }
+  disabled={click}
+  style={({ pressed }) => [
+    styles.startBtn,
+    pressed && styles.buttonPressed,
+    click && styles.buttonDisabled,
+  ]}
+>
+  <Text style={styles.startBtnText}>
+    🚀 Start Quiz
+  </Text>
+</Pressable>
+
+{/* Login button */}
+{!isAuthenticated && (
+  <Pressable
+    onPress={() => router.push('/login')}
+    style={({ pressed }) => [
+      styles.loginBtn,
+      pressed && styles.buttonPressed,
+    ]}
+  >
+    <Text style={styles.loginBtnText}>
+      🔐 Se connecter
+    </Text>
+  </Pressable>
+)}
+
       </View>
     </Screen>
   );
@@ -133,7 +153,8 @@ const _styles_ = (C: any, loading: boolean) =>
     quizCategory: { color: '#64748b', marginBottom: 12 },
     quizDescription: { fontSize: 16, lineHeight: 22, marginBottom: 20, color: C.text },
     cardBody: { backgroundColor: '#f8fafc', borderRadius: 12, padding: 16, marginBottom: 24, gap: 8 },
-    btnContainer: { backgroundColor: !loading ? C.primary : '#94a3b8',paddingVertical: 16,borderRadius: 14,alignItems: 'center' },
-    btnStartQuiz: { color: C.buttonText, fontSize: 18, fontWeight: '700'}
-    
+    startBtn: { backgroundColor: C.primary, paddingVertical: 18, borderRadius: 18, alignItems: 'center', justifyContent: 'center', marginBottom: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 6}, shadowOpacity: 0.18, shadowRadius: 8, elevation: 8}, 
+    loginBtn: { backgroundColor: '#ffffff', paddingVertical: 18, borderRadius: 18, alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderColor: C.primary, shadowColor: '#000', shadowOffset: { width: 0, height: 4}, shadowOpacity: 0.08, shadowRadius: 6, elevation: 4}, 
+    startBtnText: { color: '#fff', fontSize: 17, fontWeight: '700', letterSpacing: 0.5}, loginBtnText: { color: C.primary, fontSize: 17, fontWeight: '700', letterSpacing: 0.5}, buttonPressed: { transform: [{ scale: 0.98 }], opacity: 0.9}, 
+    buttonDisabled: { backgroundColor: '#94a3b8'}
   });

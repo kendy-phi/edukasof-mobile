@@ -15,6 +15,7 @@ export default function EntryScreen() {
   const router = useRouter();
   const { setTenant } = useTenant();
   const { theme } = useTheme();
+  const logo = require('@/assets/images/splash-no-bg.png');
 
   const handleSchool = async () => {
     await setTenant({
@@ -42,7 +43,7 @@ export default function EntryScreen() {
       {/* Logo */}
       <View style={styles.logoWrapper}>
         <Image
-          source={require('@/assets/images/splash.png')}
+          source={logo}
           style={styles.logo}
         />
       </View>
@@ -103,8 +104,8 @@ StyleSheet.create({
   },
 
   logo: {
-    width: 180,
-    height: 180,
+    width: 200,
+    height: 200,
     resizeMode: 'contain',
   },
 

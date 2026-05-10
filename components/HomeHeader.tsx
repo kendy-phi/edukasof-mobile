@@ -54,7 +54,7 @@ export default function HomeHeader({
                 marginBottom: 24,
             }}
         >
-            {/* Greeting */}
+            
             <Text
                 style={{
                     fontSize: 26,
@@ -111,7 +111,7 @@ export default function HomeHeader({
                 </Pressable>
                 )}
 
-                {/* clear cache to remove */}
+                { __DEV__ && (
                 <Pressable
                     onPress={removeCache}
                     style={{
@@ -136,7 +136,7 @@ export default function HomeHeader({
                         🧼 caches
                     </Text>
                 </Pressable>
-                
+                )}
 
                 {!isAuthenticated && (
                     <Pressable

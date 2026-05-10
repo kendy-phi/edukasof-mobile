@@ -159,7 +159,9 @@ export default function HomeScreen() {
 				}}
 			>
 				{/* HEADER */}
+				{ __DEV__ && (
 				<HomeHeader />
+				)}
 
 				{/* FEATURED */}
 				<FeaturedCarousel quizzes={quizzes.slice(0, 3)} />
