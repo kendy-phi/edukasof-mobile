@@ -99,45 +99,45 @@ export default function QuizDetailScreen() {
         />
         <CustomModal visible={visible} setVisible={setVisible} modalTitle={quiz.title} bodyText={message} />
         {/* Start button */}
-<Pressable
-  onPress={() =>
-    handleStartQuiz({
-      isAuthenticated,
-      quiz,
-      id,
-      router,
-      services,
-      setClick,
-      setReached,
-      setShowLimitModal,
-    })
-  }
-  disabled={click}
-  style={({ pressed }) => [
-    styles.startBtn,
-    pressed && styles.buttonPressed,
-    click && styles.buttonDisabled,
-  ]}
->
-  <Text style={styles.startBtnText}>
-    🚀 Start Quiz
-  </Text>
-</Pressable>
+        <Pressable
+          onPress={() =>
+            handleStartQuiz({
+              isAuthenticated,
+              quiz,
+              id,
+              router,
+              services,
+              setClick,
+              setReached,
+              setShowLimitModal,
+            })
+          }
+          disabled={click}
+          style={({ pressed }) => [
+            styles.startBtn,
+            pressed && styles.buttonPressed,
+            click && styles.buttonDisabled,
+          ]}
+        >
+          <Text style={styles.startBtnText}>
+            🚀 Start Quiz
+          </Text>
+        </Pressable>
 
-{/* Login button */}
-{!isAuthenticated && (
-  <Pressable
-    onPress={() => router.push('/login')}
-    style={({ pressed }) => [
-      styles.loginBtn,
-      pressed && styles.buttonPressed,
-    ]}
-  >
-    <Text style={styles.loginBtnText}>
-      🔐 Se connecter
-    </Text>
-  </Pressable>
-)}
+        {/* Login button */}
+        {!isAuthenticated && (
+          <Pressable
+            onPress={() => router.push('/login')}
+            style={({ pressed }) => [
+              styles.loginBtn,
+              pressed && styles.buttonPressed,
+            ]}
+          >
+            <Text style={styles.loginBtnText}>
+              🔐 Se connecter
+            </Text>
+          </Pressable>
+        )}
 
       </View>
     </Screen>

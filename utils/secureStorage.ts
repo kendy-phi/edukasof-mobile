@@ -1,4 +1,6 @@
 import * as SecureStore from 'expo-secure-store';
+import { deleteQuizzesProgress } from './quiz/quizProgress';
+import { resetGuestQuizCount } from './guestLimit';
 
 const ACCESS_TOKEN_KEY     = 'EDUKASOF_TOKEN';
 const REFRESH_TOKEN_KEY    = 'EDUKASOF_REFRESH_TOKEN';
@@ -51,10 +53,12 @@ export const getTenantName = async () => {
 };
 
 export const clearAllAuthStorage = async () => {
-  [ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, BASE_URL_KEY, TENANT_NAME_KEY, TENANT_TYPE_KEY, QUIZ_PROGRESS_KEY, GUEST_QUIZ_COUNT_KEY].forEach(async element => {
+  [ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, BASE_URL_KEY, TENANT_NAME_KEY, TENANT_TYPE_KEY].forEach(async element => {
     await SecureStore.deleteItemAsync(element);
     console.log(`${element} successfully removed`);
   });
+  deleteQuizzesProgress();
+  resetGuestQuizCount();
   console.log("Cache suppression completed successfully");
 
 };
