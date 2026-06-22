@@ -1,3 +1,13 @@
+1. SocketService
+2. SocketContext
+3. Join League
+4. Waiting Room
+5. Question Screen
+6. Submit Answer
+7. Leaderboard
+8. Reconnexion
+9. Timers automatiques
+
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
