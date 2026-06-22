@@ -1,14 +1,15 @@
 import LimitModal from '@/components/LimiModal';
+import CustomModal from '@/components/ModalUI';
 import Screen from '@/components/Screen';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { getGuestQuizCount } from '@/utils/guestLimit';
+import { handleStartQuiz } from '@/utils/quiz/startQuiz';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Quiz } from '../../../types/quiz';
-import { handleStartQuiz } from '@/utils/quiz/startQuiz';
-import CustomModal from '@/components/ModalUI';
+// import socketService from '@/service/SocketService';
 
 export default function QuizDetailScreen() {
   const { id, message } = useLocalSearchParams<{ id: string, message:string }>();

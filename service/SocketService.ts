@@ -5,6 +5,9 @@ class SocketService{
     private socket: Socket | null = null;
 
     connect(url: string){
+        console.log(`url to connect with socket: ${url}`)
+        console.log(this.socket);
+        
         if(this.socket?.connected)
             return this.socket;
 
@@ -16,16 +19,26 @@ class SocketService{
             reconnectionDelay: 1000
         });
 
+        console.log(this.socket)
+
         this.socket.on('connected', () =>{
-            console.log(`[socket] connected: ${this.socket?.id}`);
+            console.log(`[SOCKET] connected: ${this.socket?.id}`);
         });
         
         this.socket.on('disconnected', (reason) =>{
-            console.log(`[socket] disconnected: `, reason);
+            console.log(`[SOCKET] disconnected: `, reason);
         });
 
         this.socket.on('connect_error', error =>{
-            console.error(`[SOCKET] connection error`, error.message);
+            console.log(`[SOCKET] connection error`, error.message);
+        });
+
+        this.socket.onAny((event, ...args) => {
+            console.log(
+            '[SOCKET EVENT]',
+            event,
+            args,
+            );
         });
 
         return this.socket;
