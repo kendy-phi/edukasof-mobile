@@ -33,6 +33,10 @@ interface LeagueContextType{
     currentQuestion: LeagueQuestion | null;
     leaderBoard: LeaderBoardEntry[];
     leagueStarted: boolean;
+    currentLeague: any;
+    setCurrentLeague: (
+    league: any,
+    ) => void;
     joinLeague: (leagueId: string, userId: string, userName: string) => void;
     submitAnswer: (payload:{
         leagueId:string,
@@ -51,11 +55,13 @@ export const LeagueProvider = ({ children } : { children: React.ReactNode }) => 
     const [currentQuestion, setCurrentQuestion] = useState<LeagueQuestion | null>(null);
     const [leagueStarted, setLeagueStarted] = useState(false);
     const [leagueFinished, setLeagueFinished] = useState(false);
+    const [currentLeague, setCurrentLeague] = useState<any>(null);
 
     useEffect(() => {
 
-        socketService.on(SOCKET_KEY.ON_PLAYER_JOIN, (data: any) =>{
+        socketService.on(SOCKET_KEY.ON_PLAYER_JOINED, (data: any) =>{
             const list = data?.participants ?? data?.result?.participants ?? [];
+            console.log(list, data);
             setParticipants(list);
         });
 
@@ -77,7 +83,7 @@ export const LeagueProvider = ({ children } : { children: React.ReactNode }) => 
         });
 
         return () => {
-            socketService.off(SOCKET_KEY.ON_PLAYER_JOIN,)
+            socketService.off(SOCKET_KEY.ON_PLAYER_JOINED,)
             socketService.off(SOCKET_KEY.ON_LEAGUE_STARTED,)
             socketService.off(SOCKET_KEY.ON_QUESTION_STARTED,)
             socketService.off(SOCKET_KEY.ON_LEADERBOARD_UPDATED,)
@@ -87,7 +93,7 @@ export const LeagueProvider = ({ children } : { children: React.ReactNode }) => 
     }, []);
 
     const joinLeague = (leagueId: string, userId: string, userName: string) =>{
-        socketService.emit(SOCKET_KEY.ON_PLAYER_JOIN,{
+        socketService.emit(SOCKET_KEY.JOIN_LEAGUE,{
             leagueId, userId, userName
         });
     }
@@ -119,15 +125,17 @@ export const LeagueProvider = ({ children } : { children: React.ReactNode }) => 
         leaderBoard,
         leagueStarted,
         leagueFinished,
+        currentLeague,
+        setCurrentLeague,
         joinLeague,
         submitAnswer,
-        clearLeague
+        clearLeague,
+        isConnected
     }), [
         participants,
         currentQuestion,
         leaderBoard,
-        leagueStarted,
-        leagueFinished,
+        currentLeague
     ]);
 
     return (

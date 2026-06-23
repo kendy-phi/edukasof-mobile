@@ -6,7 +6,8 @@ export const ENV = {
 };
 
 export const SOCKET_KEY = {
-  ON_PLAYER_JOIN: "joinLeague",
+  JOIN_LEAGUE: "joinLeague",
+  ON_PLAYER_JOINED: "playerJoined",
   ON_LEAGUE_STARTED: "leagueStarted",
   ON_LEAGUE_FINISHED: "leagueFinished",
   ON_QUESTION_STARTED: "questionStarted",
