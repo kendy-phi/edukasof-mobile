@@ -1,8 +1,9 @@
+import { ENV } from "@/config/env";
 import { getToken } from "@/utils/secureStorage";
 import axios from "axios";
 
 export const quizClient = axios.create({
-  baseURL: "https://dev.edukasof.com/api/v1",//"https://quiz.edukasof.com",
+  baseURL: ENV.LARAVEL_API,//"https://quiz.edukasof.com",
 });
 
 quizClient.interceptors.request.use(async (config) => {

@@ -3,13 +3,13 @@ import React, {
 } from 'react';
 
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
   ActivityIndicator,
   Alert,
   StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 import {
@@ -29,12 +29,13 @@ export default function JoinLeagueScreen() {
   const router =
     useRouter();
 
-  const { user } =
-    useAuth();
-
   const {
     joinLeague,
   } = useLeague();
+
+  const {
+    services, user
+  } = useAuth();
 
   const [
     code,
@@ -63,32 +64,22 @@ export default function JoinLeagueScreen() {
           return;
         }
 
-        setLoading(true);
-
-        /**
-         * TODO
-         * API
-         */
-
-        const league = {
-          _id:
-            '6a2f113b3ba872df76393310',
-          title:
-            'Math League',
-          shareCode:
-            code.toUpperCase(),
-        };
-
-        // joinLeague(
-        //   league._id,
-        //   user?.id,
-        //   user?.name,
-        // );
-
-        router.push(
-          '/league/waiting',
-        );
-
+        try{
+          setLoading(true);
+          const result = await services?.league.joinWithSharePin(code); 
+          if(user && result){
+            joinLeague(result._id, user?.id, user?.name);
+            router.replace('/(protected)/(tabs)/league/waiting');
+          }else{
+            Alert.alert(
+              'Erreur',
+              'Impossible de rejoindre la ligue.',
+            );
+          }          
+        }catch(error){
+          console.log(`when join league failed: `, error)
+        }
+        
       } catch (error) {
 
         Alert.alert(
