@@ -1,85 +1,160 @@
 import { io, Socket } from 'socket.io-client';
 
-class SocketService{
+class SocketService {
+  private socket: Socket | null = null;
 
-    private socket: Socket | null = null;
+  connect(url: string) {
+    console.log(
+      '[SOCKET] connect() called with:',
+      url,
+    );
 
-    connect(url: string){
-        console.log(`url to connect with socket: ${url}`)
-        console.log(this.socket);
-        
-        if(this.socket?.connected)
-            return this.socket;
+    /**
+     * Si un socket existe déjà,
+     * on le réutilise au lieu d'en créer un autre.
+     */
+    if (this.socket) {
+      console.log(
+        '[SOCKET] existing socket found',
+        {
+          id: this.socket.id,
+          connected: this.socket.connected,
+        },
+      );
 
-        this.socket = io(url, {
-            transports: ['websocket'],
-            autoConnect: true,
-            reconnection: true,
-            reconnectionAttempts: Infinity,
-            reconnectionDelay: 1000
-        });
+      if (!this.socket.connected) {
+        console.log(
+          '[SOCKET] socket exists but is not connected yet. Calling connect().',
+        );
+        this.socket.connect();
+      }
 
-        console.log(this.socket)
-
-        this.socket.on('connected', () =>{
-            console.log(`[SOCKET] connected: ${this.socket?.id}`);
-        });
-        
-        this.socket.on('disconnected', (reason) =>{
-            console.log(`[SOCKET] disconnected: `, reason);
-        });
-
-        this.socket.on('connect_error', error =>{
-            console.log(`[SOCKET] connection error`, error.message);
-        });
-
-        this.socket.onAny((event, ...args) => {
-            console.log(
-            '[SOCKET EVENT]',
-            event,
-            args,
-            );
-        });
-
-        return this.socket;
+      return this.socket;
     }
 
-    disconnect(){
-        if(!this.socket) return;
+    this.socket = io(url, {
+      transports: ['websocket'],
+      autoConnect: true,
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      path: '/socket.io',
+    });
 
-        this.socket.disconnect();
-        this.socket = null;
+    console.log('[SOCKET] socket instance created');
+
+    /**
+     * IMPORTANT:
+     * les vrais événements natifs côté client sont
+     * "connect" et "disconnect"
+     */
+    this.socket.on('connect', () => {
+      console.log(
+        '[SOCKET] connected:',
+        this.socket?.id,
+      );
+    });
+
+    this.socket.on('disconnect', reason => {
+      console.log(
+        '[SOCKET] disconnected:',
+        reason,
+      );
+    });
+
+    this.socket.on('connect_error', error => {
+      console.log(
+        '[SOCKET] connection error:',
+        error.message,
+      );
+    });
+
+    this.socket.onAny((event, ...args) => {
+      console.log(
+        '[SOCKET EVENT]',
+        event,
+        JSON.stringify(args),
+      );
+    });
+
+    return this.socket;
+  }
+
+  disconnect() {
+    if (!this.socket) {
+      return;
     }
 
-    getSocket(){
-        return this.socket;
+    console.log('[SOCKET] disconnect()');
+
+    this.socket.disconnect();
+    this.socket = null;
+  }
+
+  getSocket() {
+    return this.socket;
+  }
+
+  isConnected() {
+    return this.socket?.connected ?? false;
+  }
+
+  emit(event: string, payload?: any) {
+    if (!this.socket) {
+      console.warn(
+        `[SOCKET] emit skipped - socket not initialized for event "${event}"`,
+      );
+      return;
     }
 
-    isConnected(){
-        return this.socket?.connected ?? false;
+    console.log(
+      '[SOCKET] emit =>',
+      event,
+      payload,
+    );
+
+    this.socket.emit(event, payload);
+  }
+
+  on(
+    event: string,
+    callback: (...args: any[]) => void,
+  ) {
+    if (!this.socket) {
+      console.warn(
+        `[SOCKET] on("${event}") skipped - socket not initialized`,
+      );
+      return;
     }
 
-    emit(event: string, payload?: any){
-        if(!this.socket) return;
+    console.log(
+      '[SOCKET] register listener =>',
+      event,
+    );
 
-        this.socket.emit(event, payload);
-        
+    this.socket.on(event, callback);
+  }
+
+  off(
+    event: string,
+    callback?: (...args: any[]) => void,
+  ) {
+    if (!this.socket) {
+      return;
     }
 
-    on(event: string, callback: (...args: any[]) => void){
-        if(!this.socket) return;
+    console.log(
+      '[SOCKET] remove listener =>',
+      event,
+    );
 
-        this.socket.on(event, callback);
+    if (callback) {
+      this.socket.off(event, callback);
+      return;
     }
 
-    off(event: string, callback?: (...args: any[]) => void){
-        if(!this.socket) return;
-        if(callback){
-            this.socket.off(event, callback);
-            return;
-        }
-        this.socket.off(event);
-    }
+    this.socket.off(event);
+  }
 }
 
 export default new SocketService();

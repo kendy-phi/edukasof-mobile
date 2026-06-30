@@ -26,11 +26,17 @@ export default function EntryScreen() {
   };
 
   const handleIndependent = async () => {
-    await setTenant({
+    const payload = {
       type: "independent",
       name: "EdukasoF Quiz",
       baseURL: ENV.LARAVEL_API
-    });
+    }
+
+    console.log(`payload to save as independent tenant: `, payload);
+
+    console.log(`process env values: `, process.env);
+    
+    await setTenant(payload);
 
     router.replace('/home');
   };

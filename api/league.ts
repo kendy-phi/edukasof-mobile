@@ -12,8 +12,9 @@ export const leagueApi = (api: AxiosInstance) => ({
     joinWithSharePin: async (token:string):Promise<League> =>{
         console.log(`base url: ${api.defaults.baseURL}, token: ${token}`);
         const response = await api.patch(`/leagues/token/${token}/join`);
-        console.log(`response: `, response);
-        return response.data;
+        const data = response.data;
+        console.log(`join league /leagues/token/${token}/join ==> `, data._id);
+        return data;
     }  
 
 });

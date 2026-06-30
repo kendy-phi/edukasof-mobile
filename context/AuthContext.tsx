@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // 🔄 Initialize Auth
     useEffect(() => {
         const initializeAuth = async () => {
-            console.log(`init auth and check tenant status tloading:${tenantLoading}`,services);
+            //console.log(`init auth and check tenant status tloading:${tenantLoading}`,services);
             
             if (tenantLoading || !services) return;           
 

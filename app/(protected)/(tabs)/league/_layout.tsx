@@ -1,12 +1,16 @@
 import { Stack } from 'expo-router';
+import { LeagueProvider } from '@/context/LeagueContext';
+
 
 export default function LeagueLayout() {
 
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-      }}
-    />
+    <LeagueProvider>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      />
+    </LeagueProvider>
   );
 }

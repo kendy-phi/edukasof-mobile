@@ -1,5 +1,6 @@
 import React, {
   useState,
+  useEffect
 } from 'react';
 
 import {
@@ -24,6 +25,12 @@ import {
   useAuth,
 } from '@/context/AuthContext';
 
+export enum LeagueStatus  {
+  OPEN ='open',
+  CLOSED = 'close',
+  STARTED = 'started'
+};
+
 export default function JoinLeagueScreen() {
 
   const router =
@@ -31,6 +38,11 @@ export default function JoinLeagueScreen() {
 
   const {
     joinLeague,
+    currentLeague,
+    setCurrentLeague,
+    ensureConnected,
+    isSocketConnected,
+    lastPlayerJoined
   } = useLeague();
 
   const {
@@ -47,53 +59,80 @@ export default function JoinLeagueScreen() {
     setLoading,
   ] = useState(false);
 
-  const handleJoin =
-    async () => {
+  useEffect(() => {
+    ensureConnected();
+  }, []);
 
-      try {
+  useEffect(() => {
+    console.log(
+      '➡️ [LeagueIndex] lastPlayerJoined =',
+      lastPlayerJoined,
+      '| user.id =',
+      user?.id,
+    );
 
-        if (
-          code.trim().length < 6
-        ) {
+    if (!user?.id || !lastPlayerJoined) {
+      return;
+    }
 
-          Alert.alert(
-            'Code invalide',
-            'Veuillez saisir un code valide.'
-          );
+    if (lastPlayerJoined === user.id) {
+      console.log('🚪 [LeagueIndex] redirect to waiting');
+      if(currentLeague !== null && currentLeague.status === LeagueStatus.STARTED)
+        router.replace('/league/play');
+      router.replace('/league/waiting');
+    }
+    
+  }, [lastPlayerJoined, user?.id]);
 
-          return;
-        }
+  const handleJoin = async () => {
+    try {
+      if (code.trim().length < 6) {
+        Alert.alert(
+          'Code invalide',
+          'Veuillez saisir un code valide.',
+        );
+        return;
+      }
 
-        try{
-          setLoading(true);
-          const result = await services?.league.joinWithSharePin(code); 
-          if(user && result){
-            joinLeague(result._id, user?.id, user?.name);
-            router.replace('/(protected)/(tabs)/league/waiting');
-          }else{
-            Alert.alert(
-              'Erreur',
-              'Impossible de rejoindre la ligue.',
-            );
-          }          
-        }catch(error){
-          console.log(`when join league failed: `, error)
-        }
-        
-      } catch (error) {
+      setLoading(true);
+      ensureConnected();
 
+      const result =
+        await services?.league?.joinWithSharePin(code.trim());
+
+      console.log(
+        'league joined by token =>',
+        result?._id,
+        'socket connected =>',
+        isSocketConnected,
+      );
+
+      if (!user || !result?._id) {
         Alert.alert(
           'Erreur',
           'Impossible de rejoindre la ligue.',
         );
-
-      } finally {
-
-        setLoading(false);
-
+        return;
       }
-    };
 
+      setCurrentLeague(result);
+
+      joinLeague(
+        result._id,
+        result.userId,
+        user.name,
+      );
+    } catch (error) {
+      console.log('when join league failed =>', error);
+
+      Alert.alert(
+        'Erreur',
+        'Impossible de rejoindre la ligue.',
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
 
     <View

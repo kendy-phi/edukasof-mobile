@@ -1,7 +1,7 @@
 import { AuthProvider } from "@/context/AuthContext";
 import { TenantProvider } from "@/context/TenantContext";
 import { ThemeProvider } from '@/context/ThemeContext';
-import { LeagueProvider } from '@/context/LeagueContext';
+
 import { Stack } from "expo-router";
 
 export default function RootLayout() {
@@ -9,13 +9,12 @@ export default function RootLayout() {
         <TenantProvider>
             <AuthProvider>
                 <ThemeProvider>
-                    <LeagueProvider>
+                    
                     <Stack
                         screenOptions={{
                             headerShown: false,
                         }}
                     />
-                    </LeagueProvider>
                 </ThemeProvider>
 
             </AuthProvider>

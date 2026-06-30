@@ -112,7 +112,7 @@ export const createApiClient = (tenantUrl: string) => {
                 Alert.alert("Access!", "Vous n'avez pas accès avec la resource demander.");
             } else if (error?.response?.status >= 500) {
                 // Cas 2 : Erreur serveur générique (500)
-                Alert.alert("Erreur Serveur", "Un problème est survenu sur nos serveurs.");
+                Alert.alert("Erreur Serveur", error?.response?.data?.message ?? "Un problème est survenu sur nos serveurs.");
                 console.log("Error status: ", error?.response?.status)
             } else if(error?.response?.status != 422) {
                 // Cas 3 : Problème de connexion (Pas de réponse du serveur)
